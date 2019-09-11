@@ -15,9 +15,6 @@ from Users.utils import Response
 def validate(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
-                header = request.headers
-                print(b64decode(header['Authorization']))                
-                print(data)
                 keys = set(data.keys())
                 if {'username','password'}.issubset(keys):
                         username = data['username']  
@@ -161,110 +158,162 @@ def validate_registration(request):
 #how will you send the username ???
 @csrf_exempt
 def check_username(request):
-        try:
-                data = json.loads(request.body.decode('utf-8'))
-                user_cred = User_Credentials.objects.get(user_name = data['username'])
-                resp = Response(201,"False")
-                return JsonResponse(resp,status = 201)
-        except:
-                resp = Response(200,"True")
-                return JsonResponse(resp,status = 200)
+        if request.method == "POST":
+                try:
+                        data = json.loads(request.body.decode('utf-8'))
+                        user_cred = User_Credentials.objects.get(user_name = data['username'])
+                        resp = Response(201,"False")
+                        return JsonResponse(resp,status = 201)
+                except:
+                        resp = Response(200,"True")
+                        return JsonResponse(resp,status = 200)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
 
 #-----------------------------------------------------------------------------------------
 
 @csrf_exempt
 def change_password(request):
-        data = json.loads(request.body.decode('utf-8'))
-        if {'username','old_password','new_password'}.issubset(data.keys()):
-                username = data['username']
-                old_password = data['old_password']
-                new_password = data['new_password']
-                try:
-                        user_cred = User_Credentials.objects.get(user_name = username)
-                        if (old_password == user_cred.password):
-                                user_cred.password = new_password
-                                user_cred.save()
-                                resp = Response(200, "password changed successfully")
-                                return JsonResponse(resp,status = 200)
-                        else:
-                                resp = Response(202,"Old password is incorrect !!")
-                                return JsonResponse(resp,status = 202)
-                except User_Credentials.DoesNotExist:
-                        resp = Response(405, "Wrong user name ")
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'username','old_password','new_password'}.issubset(data.keys()):
+                        username = data['username']
+                        old_password = data['old_password']
+                        new_password = data['new_password']
+                        try:
+                                user_cred = User_Credentials.objects.get(user_name = username)
+                                if (old_password == user_cred.password):
+                                        user_cred.password = new_password
+                                        user_cred.save()
+                                        resp = Response(200, "password changed successfully")
+                                        return JsonResponse(resp,status = 200)
+                                else:
+                                        resp = Response(202,"Old password is incorrect !!")
+                                        return JsonResponse(resp,status = 202)
+                        except User_Credentials.DoesNotExist:
+                                resp = Response(405, "Wrong user name ")
+                                return JsonResponse(resp,status = 405)
+                else:
+                        resp = Response(405,"Wrong key value")
                         return JsonResponse(resp,status = 405)
         else:
-                resp = Response(405,"Wrong key value")
+                resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
+
 
 #----------------------------------------------------------------------------------------
 
 @csrf_exempt
 def get_user(request):
-        data = json.loads(request.body.decode('utf-8'))
-        if {'username'}.issubset(data.keys()):
-                try:
-                        user_obj = User_Credentials.objects.get(user_name =  data['username'])
-                        user = user_obj.user
-                        city = user.city
-                        user_dict = {
-                                'firstName':user.first_name,
-                                'lastName' : user.last_name,
-                                'middleName':user.middle_name,
-                                'id':user.id,
-                                'email':user.email,
-                                'phone':user.phone,
-                                'address1':user.address1,
-                                'address2':user.address2,
-                                'userTypeId':user.user_type_id,
-                                'city':{
-                                'name':city.city_text,
-                                'id' : city.id,
-                                },
-                        
-                        }                               
-                        return JsonResponse(user_dict,status = 200)
-                        
-                except User_Credentials.DoesNotExist:
-                        resp = Response(405, "Wrong User ! ")
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'username'}.issubset(data.keys()):
+                        try:
+                                user_obj = User_Credentials.objects.get(user_name =  data['username'])
+                                user = user_obj.user
+                                city = user.city
+                                user_dict = {
+                                        'firstName':user.first_name,
+                                        'lastName' : user.last_name,
+                                        'middleName':user.middle_name,
+                                        'id':user.id,
+                                        'email':user.email,
+                                        'phone':user.phone,
+                                        'address1':user.address1,
+                                        'address2':user.address2,
+                                        'userTypeId':user.user_type_id,
+                                        'city':{
+                                        'name':city.city_text,
+                                        'id' : city.id,
+                                        },
+                                
+                                }                               
+                                return JsonResponse(user_dict,status = 200)
+                                
+                        except User_Credentials.DoesNotExist:
+                                resp = Response(405, "Wrong User ! ")
+                                return JsonResponse(resp,status = 405)
+                
+                else:
+                        resp = Response(405,"Wrong key value")
                         return JsonResponse(resp,status = 405)
-        
         else:
-                resp = Response(405,"Wrong key value")
+                resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
+
 
 #----------------------------------------------------------------------------------------
 
 @csrf_exempt
 def create_group(request):
-        data = json.loads(request.body.decode('utf-8'))
-        if {'group_name','user_id'}.issubset(data.keys()):
-                user_obj = Master_Users.objects.get(id = data['user_id'])
-                group_obj = Master_Groups.objects.create(group_name = data['group_name'],group_admin = user_obj)
-                group_obj.save()
-                group_dict = {
-                        "name":group_obj.group_name,
-                        "id":group_obj.id,
-                }
-                return JsonResponse(group_dict,status = 200)
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_name','user_id'}.issubset(data.keys()):
+                        user_obj = Master_Users.objects.get(id = data['user_id'])
+                        group_obj = Master_Groups.objects.create(group_name = data['group_name'],group_admin = user_obj)
+                        group_obj.save()
+                        group_dict = {
+                                "name":group_obj.group_name,
+                                "id":group_obj.id,
+                        }
+                        return JsonResponse(group_dict,status = 200)
+                else:
+                        resp = Response(405,"Wrong key value")
+                        return JsonResponse(resp,status = 405)
+
         else:
-                resp = Response(405,"Wrong key value")
+                resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
+
 
 #-------------------------------------------------------------------------------------------------
 
 @csrf_exempt
 def add_user_to_group(request):
-        data = json.loads(request.body.decode('utf-8'))
-        if {'group_id','user_array'}.issubset(data.keys()):
-                group_obj = Master_Groups.objects.get(id = data['group_id'])
-                user_arr = data['user_array']
-                for i in range(0,len(user_arr)):
-                        user_obj = Master_Users.objects.get(id = user_arr[i])
-                        group_mapping = User_Group_Mapping.objects.create(user = user_obj,group = group_obj)
-                        group_mapping.save()
-                resp = Response(200,"Users added successfully")
-                return JsonResponse(resp,status = 200)
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id','user_array'}.issubset(data.keys()):
+                        group_obj = Master_Groups.objects.get(id = data['group_id'])
+                        user_arr = data['user_array']
+                        for i in range(0,len(user_arr)):
+                                user_obj = Master_Users.objects.get(id = user_arr[i])
+                                group_mapping = User_Group_Mapping.objects.create(user = user_obj,group = group_obj)
+                                group_mapping.save()
+                        resp = Response(200,"Users added successfully")
+                        return JsonResponse(resp,status = 200)
 
+                else:
+                        resp = Response(405,"Wrong key value")
+                        return JsonResponse(resp,status = 405)
         else:
-                resp = Response(405,"Wrong key value")
+                resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
+
+
+#add city 
+#modify city
+#delete city
+#fetch all 
+@csrf_exempt
+def get_all_cities(request):
+        if request.method == "POST":
+                cities = Master_City.objects.filter(is_available = True)
+                arr_dict = []
+                data_dict = {
+                        'data':arr_dict
+                }
+                data_id = []
+                data_text = []
+                for city in cities:
+                        temp_dict = {
+                                'id':city.id,
+                                'name':city.city_text
+                        }
+                        arr_dict.append(temp_dict)
+                return JsonResponse(data_dict,status = 200)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
