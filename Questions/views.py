@@ -32,11 +32,11 @@ def add_question(request):
                         correct_option = Master_Correct_Option.objects.create(option = option_obj,question = question_obj)
                         correct_option.save()
 
-            resp = Response(200, "1")
+            resp = Response(200, "Question added successfully")
             return JsonResponse(resp,status = 200)  
             
         else:
-            resp = Response(405, "0")
+            resp = Response(405, "Wrong key value pair")
             return JsonResponse(resp,status = 405)
     else:
                 resp = Response(405,'Bad Request!!')
@@ -58,17 +58,15 @@ def delete_question(request):
             for correct_option in correct_option_obj:
                 correct_option.is_available = False
                 correct_option.save()
-            resp = Response(200,"1")
+            resp = Response(200,"Question deleted successfully")
             return JsonResponse(resp,status = 200)
         else:
-            resp = Response(405, "0")
+            resp = Response(405, "Wrong key value pair")
             return JsonResponse(resp,status = 405)
     else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
     
-#Still not working !! 
-#Complete it by tommorow 12 Sept
 @csrf_exempt
 def update_question(request):
     if request.method == "POST":
@@ -84,13 +82,78 @@ def update_question(request):
             question_obj.save()
             options_arr = data['options']
             correct_arr = data['correct_options']
-            resp = Response(200, "1")
+            correct_objs = Master_Correct_Option.objects.filter(question = int(data['question_id']))
+            print(correct_objs)
+            #deleting past correct options
+            for correct_obj in correct_objs:
+                correct_obj.is_available = False
+                correct_obj.save()
+            #deleting past options
+            option_objs = Master_Option.objects.filter(question = int(data['question_id']))
+            for option_obj in option_objs:
+                option_obj.is_available = False
+                option_obj.save()
+            for i in range(0,len(options_arr)):
+                option_obj = Master_Option.objects.create(option_text = options_arr[i],question = question_obj)
+                option_obj.save()
+                for j in range(0,len(correct_arr)):
+                    if (i == int(correct_arr[j])):
+                        correct_option = Master_Correct_Option.objects.create(option = option_obj,question = question_obj)
+                        correct_option.save()    
+            resp = Response(200, "Question modified successfully")
             return JsonResponse(resp,status = 200)  
         else:
-            resp = Response(405, "0")
+            resp = Response(405, "Wrong key value pair")
             return JsonResponse(resp,status = 405)
     else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
 
+@csrf_exempt
+def get_all_questions(request):
+    if request.method == "POST":
+        data = json.loads(request.body.decode('utf-8'))
+        if {'subtopic_id'}.issubset(data.keys()):
+            subtopic = Master_SubTopic.objects.get(id = data['subtopic_id'])
+            questions = Master_Question.objects.filter(subtopic = subtopic,is_available = True)
+            arr_dict = []
+            correct_option_arr = []
+            option_arr = []
+            questions_data = {'data':arr_dict}
+            try:
+                for question in questions:
+                    options = Master_Option.objects.filter(question = question,is_available = True)
+                    for option in options:
+                        option_dict = {
+                            'option_text':option.option_text,
+                            'option_id':option.id
+                        }
+                        option_arr.append(option_dict)
+                    correct_options = Master_Correct_Option.objects.filter(question = question,is_available = True)
+                    for correct_option in correct_options:
+                        correct_option_dict = {
+                            'correct_option_text':str(correct_option.option.option_text),
+                            'correct_option_id':correct_option.id
+                        }
+                        correct_option_arr.append(correct_option_dict)
+                    temp_dict = {
+                        'question_text':question.question_text,
+                        'question_marks':question.question_marks,
+                        'question_id':question.id,
+                        'question_type':question.question_type,
+                        'question_difficulty':question.difficulty,
+                        'options':option_arr,
+                        'correct_options':correct_option_arr
+                    }
+                    arr_dict.append(temp_dict)
+                return JsonResponse(questions_data,status = 200)
+            except:
+                resp = Response('Something went wrong GEN 1',Exception)
+                return JsonResponse(resp, status = 405)
+        else:
+            resp = Response(405, "Wrong key value pair")
+            return JsonResponse(resp,status = 405)        
 
+    else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)

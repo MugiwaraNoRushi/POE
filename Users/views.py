@@ -9,7 +9,7 @@ from django.shortcuts import render
 from Users.models import User_Credentials,Master_Users,Master_City,Temp_Master_Users, Master_Groups,User_Group_Mapping
 from Users.utils import Response
 
-#-----------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------
 
 @csrf_exempt
 def validate(request):
@@ -292,10 +292,10 @@ def add_user_to_group(request):
                 return JsonResponse(resp,status = 405)
 
 
-#add city 
-#modify city
-#delete city
-#fetch all 
+#--------------------------------------------------------------------------------------------------
+
+#CITIES !! 
+
 @csrf_exempt
 def get_all_cities(request):
         if request.method == "POST":
@@ -304,8 +304,6 @@ def get_all_cities(request):
                 data_dict = {
                         'data':arr_dict
                 }
-                data_id = []
-                data_text = []
                 for city in cities:
                         temp_dict = {
                                 'id':city.id,
@@ -313,6 +311,56 @@ def get_all_cities(request):
                         }
                         arr_dict.append(temp_dict)
                 return JsonResponse(data_dict,status = 200)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def delete_city(request):
+        if request.method == 'POST':
+                data = json.loads(request.body.decode('utf-8'))
+                if {'id'}.issubset(data.keys()):
+                        city = Master_City.objects.get(id = data['id'])
+                        city.is_available = False
+                        city.save()
+                        resp = Response(200,"1")
+                        return JsonResponse(resp,status = 200)
+                else:
+                        resp = Response(405,"Wrong key value")
+                        return JsonResponse(resp,status = 405)   
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def modify_city(request):
+        if request.method == 'POST':
+                data = json.loads(request.body.decode('utf-8'))
+                if {'id','text'}.issubset(data.keys()):
+                        city = Master_City.objects.get(id = data['id'])
+                        city.city_text = data['text']
+                        city.save()
+                        resp = Response(200,"1")
+                        return JsonResponse(resp,status = 200)
+                else:
+                        resp = Response(405,"Wrong key value")
+                        return JsonResponse(resp,status = 405)   
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def add_city(request):
+        if request.method == 'POST':
+                data = json.loads(request.body.decode('utf-8'))
+                if {'text'}.issubset(data.keys()):
+                        city = Master_City.objects.create(city_text = data['text'])
+                        city.save()
+                        resp = Response(200,"1")
+                        return JsonResponse(resp,status = 200)
+                else:
+                        resp = Response(405,"Wrong key value")
+                        return JsonResponse(resp,status = 405)   
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
