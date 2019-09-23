@@ -36,8 +36,8 @@ def add_question(request):
             return JsonResponse(resp,status = 200)  
             
         else:
-            resp = Response(405, "Wrong key value pair")
-            return JsonResponse(resp,status = 405)
+            resp = Response(204, "Wrong key value pair")
+            return JsonResponse(resp,status = 204)
     else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -47,22 +47,26 @@ def delete_question(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
         if ({'question_id'}.issubset(data.keys())):
-            question_obj = Master_Question.objects.get(id = data['question_id'])
-            question_obj.is_available = False
-            question_obj.save()
-            option_obj = Master_Option.objects.filter(question = question_obj)
-            for option in option_obj:
-                option.is_available = False
-                option.save()
-            correct_option_obj = Master_Correct_Option.objects.filter(question = question_obj)
-            for correct_option in correct_option_obj:
-                correct_option.is_available = False
-                correct_option.save()
-            resp = Response(200,"Question deleted successfully")
-            return JsonResponse(resp,status = 200)
+            try:
+                question_obj = Master_Question.objects.get(id = data['question_id'],is_available = True)
+                question_obj.is_available = False
+                question_obj.save()
+                option_obj = Master_Option.objects.filter(question = question_obj,is_available =True)
+                for option in option_obj:
+                    option.is_available = False
+                    option.save()
+                correct_option_obj = Master_Correct_Option.objects.filter(question = question_obj,is_available = True)
+                for correct_option in correct_option_obj:
+                    correct_option.is_available = False
+                    correct_option.save()
+                resp = Response(200,"Question deleted successfully")
+                return JsonResponse(resp,status = 200)
+            except:
+                resp = Response(203,'Question or Options doesnot exists')
+                return JsonResponse(resp,status = 203)
         else:
-            resp = Response(405, "Wrong key value pair")
-            return JsonResponse(resp,status = 405)
+            resp = Response(204, "Wrong key value pair")
+            return JsonResponse(resp,status = 204)
     else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -103,8 +107,8 @@ def update_question(request):
             resp = Response(200, "Question modified successfully")
             return JsonResponse(resp,status = 200)  
         else:
-            resp = Response(405, "Wrong key value pair")
-            return JsonResponse(resp,status = 405)
+            resp = Response(204, "Wrong key value pair")
+            return JsonResponse(resp,status = 204)
     else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -149,10 +153,10 @@ def get_all_questions(request):
                 return JsonResponse(questions_data,status = 200)
             except:
                 resp = Response('Something went wrong GEN 1',Exception)
-                return JsonResponse(resp, status = 405)
+                return JsonResponse(resp, status = 477)
         else:
-            resp = Response(405, "Wrong key value pair")
-            return JsonResponse(resp,status = 405)        
+            resp = Response(204, "Wrong key value pair")
+            return JsonResponse(resp,status = 204)        
 
     else:
                 resp = Response(405,'Bad Request!!')

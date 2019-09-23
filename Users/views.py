@@ -20,19 +20,19 @@ def validate(request):
                         username = data['username']  
                         password = data['password']
                 else:
-                        resp = Response(405,"Wrong key value")
-                        return JsonResponse(resp,status = 405)
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
                 try:
                         user_obj = User_Credentials.objects.get(user_name =  username,password = password,is_active = True)
                         return get_user(request)
                 except User_Credentials.DoesNotExist:
-                        resp = Response(405,"Your Credentials are incorrect, Please try again")
-                        return JsonResponse(resp,status = 405)
+                        resp = Response(203,"Your Credentials are incorrect, Please try again")
+                        return JsonResponse(resp,status = 203)
                 except:
-                        resp = Response(405, Exception)
-                        return JsonResponse(resp,status = 405)
+                        resp = Response(477, Exception)
+                        return JsonResponse(resp,status = 477)
         else:
-                resp = Response(405,'Bad Request!!')
+                resp = Response(205,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
 
 #-----------------------------------------------------------------------------------------
@@ -52,14 +52,14 @@ def signup(request):
                                 difference = timedelta(days = 0,hours = 1,minutes = 0 )
                                 if (now - temp.entry_time < difference):
                                 #can also change status to show this 
-                                        resp = Response(200, "Email already resgistered and check mail")
-                                        return JsonResponse(resp,status = 200)
+                                        resp = Response(203, "Email already resgistered and check mail")
+                                        return JsonResponse(resp,status = 203)
                         except Temp_Master_Users.DoesNotExist:
                                 print("new email id ")
                         try:
                                 temp = Master_Users.objects.get(email = email)
-                                resp = Response(200, "Email already resgistered and try login ")
-                                return JsonResponse(resp,status = 200)
+                                resp = Response(203, "Email already resgistered and try login ")
+                                return JsonResponse(resp,status = 203)
                         except Master_Users.DoesNotExist:
                                 print("new email id ")
                         city = data['city']
@@ -94,8 +94,8 @@ def signup(request):
                         return JsonResponse(val_dict,status = 200)
 
                 else:
-                       resp = Response(405,"Wrong key value")
-                       return JsonResponse(resp,status = 405)
+                       resp = Response(204,"Wrong key value")
+                       return JsonResponse(resp,status = 204)
                 
         else:
                 resp = Response(405,'Bad Request!!')
@@ -147,8 +147,8 @@ def validate_registration(request):
 
                 except Temp_Master_Users.DoesNotExist:
                         #change the message to a proper message
-                        resp = Response(202,"Wrong Registration Number !!")
-                        return JsonResponse(resp,status = 202)
+                        resp = Response(203,"Wrong Registration Number !!")
+                        return JsonResponse(resp,status = 203)
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -162,8 +162,8 @@ def check_username(request):
                 try:
                         data = json.loads(request.body.decode('utf-8'))
                         user_cred = User_Credentials.objects.get(user_name = data['username'])
-                        resp = Response(201,"False")
-                        return JsonResponse(resp,status = 201)
+                        resp = Response(203,"Username exists and You cannot use it")
+                        return JsonResponse(resp,status = 203)
                 except:
                         resp = Response(200,"True")
                         return JsonResponse(resp,status = 200)
@@ -190,14 +190,14 @@ def change_password(request):
                                         resp = Response(200, "password changed successfully")
                                         return JsonResponse(resp,status = 200)
                                 else:
-                                        resp = Response(202,"Old password is incorrect !!")
-                                        return JsonResponse(resp,status = 202)
+                                        resp = Response(203,"Old password is incorrect !!")
+                                        return JsonResponse(resp,status = 203)
                         except User_Credentials.DoesNotExist:
-                                resp = Response(405, "Wrong user name ")
-                                return JsonResponse(resp,status = 405)
+                                resp = Response(203, "Wrong user name ")
+                                return JsonResponse(resp,status = 203)
                 else:
-                        resp = Response(405,"Wrong key value")
-                        return JsonResponse(resp,status = 405)
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -233,12 +233,12 @@ def get_user(request):
                                 return JsonResponse(user_dict,status = 200)
                                 
                         except User_Credentials.DoesNotExist:
-                                resp = Response(405, "Wrong User ! ")
-                                return JsonResponse(resp,status = 405)
+                                resp = Response(203, "username doesnot exists")
+                                return JsonResponse(resp,status = 203)
                 
                 else:
-                        resp = Response(405,"Wrong key value")
-                        return JsonResponse(resp,status = 405)
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -260,8 +260,8 @@ def create_group(request):
                         }
                         return JsonResponse(group_dict,status = 200)
                 else:
-                        resp = Response(405,"Wrong key value")
-                        return JsonResponse(resp,status = 405)
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
 
         else:
                 resp = Response(405,'Bad Request!!')
@@ -285,8 +285,8 @@ def add_user_to_group(request):
                         return JsonResponse(resp,status = 200)
 
                 else:
-                        resp = Response(405,"Wrong key value")
-                        return JsonResponse(resp,status = 405)
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -323,11 +323,11 @@ def delete_city(request):
                         city = Master_City.objects.get(id = data['id'])
                         city.is_available = False
                         city.save()
-                        resp = Response(200,"1")
+                        resp = Response(200,"City deleted successfuly")
                         return JsonResponse(resp,status = 200)
                 else:
-                        resp = Response(405,"Wrong key value")
-                        return JsonResponse(resp,status = 405)   
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)   
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -340,11 +340,11 @@ def modify_city(request):
                         city = Master_City.objects.get(id = data['id'])
                         city.city_text = data['text']
                         city.save()
-                        resp = Response(200,"1")
+                        resp = Response(200,"City modified")
                         return JsonResponse(resp,status = 200)
                 else:
-                        resp = Response(405,"Wrong key value")
-                        return JsonResponse(resp,status = 405)   
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)   
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -354,13 +354,18 @@ def add_city(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
                 if {'text'}.issubset(data.keys()):
-                        city = Master_City.objects.create(city_text = data['text'])
-                        city.save()
-                        resp = Response(200,"1")
-                        return JsonResponse(resp,status = 200)
+                        try:
+                                city = Master_City.objects.get(city_text = data['text'])
+                                resp = Response(203,'City already exists ')
+                                return JsonResponse(resp, status = 203)
+                        except:
+                                city = Master_City.objects.create(city_text = data['text'])
+                                city.save()
+                                resp = Response(200,"1")
+                                return JsonResponse(resp,status = 200)
                 else:
-                        resp = Response(405,"Wrong key value")
-                        return JsonResponse(resp,status = 405)   
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)   
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)

@@ -13,16 +13,16 @@ def create_topic(request):
         if {'text'}.issubset(data.keys()):
             try:
                 topic = Master_Topic.objects.get(topic_text = data['text'])
-                resp = Response(405,"Topic already exists")
-                return JsonResponse(resp, status = 405)
+                resp = Response(203,"Topic already exists")
+                return JsonResponse(resp, status = 203)
             except Master_Topic.DoesNotExist:
                 topic = Master_Topic.objects.create(topic_text = data['text'])
                 topic.save()
                 resp = Response(200,"Created successfully")
                 return JsonResponse(resp,status = 200)
         else:
-            resp = Response(405, "Wrong key value ")
-            return JsonResponse(resp,status = 405)
+            resp = Response(204, "Wrong key value ")
+            return JsonResponse(resp,status = 204)
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
@@ -36,16 +36,16 @@ def create_subtopic(request):
             try:
                 topic = Master_Topic.objects.get(id = data['topic_id'])
                 subtopic = Master_SubTopic.objects.get(subtopic_text = data['text'],topic = data['topic_id'])
-                resp = Response(405,"SubTopic already exists")
-                return JsonResponse(resp, status = 405)
+                resp = Response(203,"SubTopic already exists")
+                return JsonResponse(resp, status = 203)
             except Master_SubTopic.DoesNotExist:
                 subtopic = Master_SubTopic.objects.create(subtopic_text = data['text'],topic = topic)
                 subtopic.save()
                 resp = Response(200,"Created successfully")
                 return JsonResponse(resp,status = 200)
         else:
-            resp = Response(405, "Wrong key value")
-            return JsonResponse(resp,status = 405)
+            resp = Response(204, "Wrong key value")
+            return JsonResponse(resp,status = 204)
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
@@ -63,11 +63,11 @@ def get_topic(request):
                 }
                 return JsonResponse(topic_dict, status = 200)
             except Master_Topic.DoesNotExist:
-                resp = Response(405,"Topic doesnot exist")
-                return JsonResponse(resp,status = 405)
+                resp = Response(203,"Topic doesnot exist")
+                return JsonResponse(resp,status = 203)
         else:
-            resp = Response(405, "Wrong key value ")
-            return JsonResponse(resp,status = 405)
+            resp = Response(204, "Wrong key value ")
+            return JsonResponse(resp,status = 204)
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
@@ -90,11 +90,11 @@ def get_subtopic(request):
                 }
                 return JsonResponse(subtopic_dict, status = 200)
             except Master_SubTopic.DoesNotExist:
-                resp = Response(405,"Subtopic doesnot exist")
-                return JsonResponse(resp,status = 405)
+                resp = Response(203,"Subtopic doesnot exist")
+                return JsonResponse(resp,status = 203)
         else:
-            resp = Response(405, "Wrong key value")
-            return JsonResponse(resp,status = 405)
+            resp = Response(204, "Wrong key value")
+            return JsonResponse(resp,status = 204)
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
@@ -114,11 +114,11 @@ def delete_subtopic(request):
                 resp = Response(200, "Deleted successfully")
                 return JsonResponse(resp, status = 200)
             except Master_SubTopic.DoesNotExist:
-                resp = Response(405,"Subtopic doesnot exist")
-                return JsonResponse(resp,status = 405)
+                resp = Response(203,"Subtopic doesnot exist")
+                return JsonResponse(resp,status = 203)
         else:
-            resp = Response(405, "Wrong key value")
-            return JsonResponse(resp,status = 405)
+            resp = Response(204, "Wrong key value")
+            return JsonResponse(resp,status = 204)
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
@@ -136,11 +136,11 @@ def delete_topic(request):
                 resp = Response(200, "Deleted successfully")
                 return JsonResponse(resp, status = 200)
             except Master_SubTopic.DoesNotExist:
-                resp = Response(405,"topic doesnot exist")
-                return JsonResponse(resp,status = 405)
+                resp = Response(203,"topic doesnot exist")
+                return JsonResponse(resp,status = 203)
         else:
-            resp = Response(405, "Wrong key value")
-            return JsonResponse(resp,status = 405)
+            resp = Response(204, "Wrong key value")
+            return JsonResponse(resp,status = 204)
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
