@@ -43,7 +43,7 @@ def signup(request):
                 data = json.loads(request.body.decode('utf-8'))
                 print(data)
                 keys = set(data.keys())
-                if {'f_name','m_name','l_name','address1','address2','email','phone','city','username','password','user_type'}.issubset(keys):
+                if {'f_name','m_name','l_name','address1','address2','email','phone','city_id','username','password','user_type'}.issubset(keys):
                         email = data['email']
                         #if email already exists !! 
                         try:
@@ -62,8 +62,8 @@ def signup(request):
                                 return JsonResponse(resp,status = 203)
                         except Master_Users.DoesNotExist:
                                 print("new email id ")
-                        city = data['city']
-                        city_obj = Master_City.objects.get(city_text = city)
+                        city_id = data['city_id']
+                        city_obj = Master_City.objects.get(id = city_id)
                         #city what to do if it does not exists
                         #user type decide 
                         random_num = int(random.random()*1000000)
@@ -80,7 +80,6 @@ def signup(request):
                                 user_type_id = data['user_type'],
                                 city = city_obj,
                                 entry_time = datetime.now(),
-                                #generate random number ????
                                 registration_code = random_num
                                 )
                         user.save()

@@ -51,50 +51,37 @@ def create_subtopic(request):
         return JsonResponse(resp,status = 405)
 
 @csrf_exempt
-def get_topic(request):
+def get_all_topics(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'text'}.issubset(data.keys()):
-            try:
-                topic = Master_Topic.objects.get(topic_text = data['text'],is_available = True)
-                topic_dict = {
-                    "topic_text":topic.topic_text,
-                    "topic_id":topic.id
-                }
-                return JsonResponse(topic_dict, status = 200)
-            except Master_Topic.DoesNotExist:
-                resp = Response(203,"Topic doesnot exist")
-                return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value ")
-            return JsonResponse(resp,status = 204)
+        topics_arr = []
+        topics_dict = {'data':topics_arr}
+        topics = Master_Topic.objects.all()
+        for topic in topics:
+            temp = {
+                'id':topic.id,
+                'text':topic.topic_text,
+            }
+            topics_arr.append(temp)
+        return JsonResponse(topics_dict,status = 200)
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
 @csrf_exempt
-def get_subtopic(request):
+def get_all_subtopics(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'text','topic_id'}.issubset(data.keys()):
-            try:
-                topic = Master_Topic.objects.get(id = data['topic_id'])
-                subtopic = Master_SubTopic.objects.get(subtopic_text = data['text'],topic = data['topic_id'],is_available = True)
-                subtopic_dict = {
-                    "subtopic_text":subtopic.subtopic_text,
-                    "subtopic_id":subtopic.id,
-                    "topic":{
-                        "id":topic.id,
-                        "topic_text":topic.topic_text
-                    }
-                }
-                return JsonResponse(subtopic_dict, status = 200)
-            except Master_SubTopic.DoesNotExist:
-                resp = Response(203,"Subtopic doesnot exist")
-                return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
+        subtopics_arr = []
+        subtopics_dict = {'data':subtopics_arr}
+        subtopics = Master_SubTopic.objects.all()
+        for subtopic in subtopics:
+            temp = {
+                'id':subtopic.id,
+                'text':subtopic.topic_text,
+            }
+            subtopics_arr.append(temp)
+        return JsonResponse(subtopics_dict,status = 200)
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)

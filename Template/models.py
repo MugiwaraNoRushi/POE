@@ -16,4 +16,6 @@ class Master_Section(models.Model):
 
 class Template_Section(models.Model):
     section = models.ForeignKey('Master_Section',on_delete = models.SET_NULL,null =True)
-    subtopic = models.ForeignKey('Topics.Master_SubTopic',on_delete = models.SET_NULL, null = True)    
+    subtopic = models.ForeignKey('Topics.Master_SubTopic',on_delete = models.SET_NULL, null = True)  
+    no_questions = models.IntegerField()
+    difficulty_id = models.SmallIntegerField()  
