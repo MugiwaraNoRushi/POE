@@ -51,7 +51,6 @@ def delete_Template(request):
 @csrf_exempt
 def get_all_Templates(request):
     if request.method == 'POST':
-        data = json.loads(request.body.decode('utf-8'))
         templates_arr = []
         templates_dict = {'data':templates_arr}
         temp = {}
@@ -172,7 +171,6 @@ def update_Section(request):
 @csrf_exempt
 def get_all_Sections(request):
     if request.method == 'POST':
-        data = json.loads(request.body.decode('utf-8'))
         sections_arr = []
         sections_dict = {'data':sections_arr}
         temp = {}
@@ -197,3 +195,112 @@ def get_all_Sections(request):
     else:
         resp = Response(405,'Wrong Request')
         return JsonResponse(resp, status = 405)
+
+@csrf_exempt
+def create_template_section(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'section_id','subtopic_id','difficulty_id','no_question'}.issubset(data.keys()):
+            try:
+                section = Master_Section.objects.get(id = data['section_id'],is_available = True)
+                subtopic = Master_SubTopic.objects.get(id = data['subtopic_id'],is_available = True)
+                temp_section = Template_Section.objects.create(
+                    section =section,
+                    subtopic = subtopic,
+                    difficulty_id = data['difficulty_id'],
+                    no_questions = data['no_question'] 
+                )
+                temp_section.save()
+            except Master_Section.DoesNotExist:
+                resp = Response(203,'section doesnot exist')
+                return JsonResponse(resp,status = 203)
+            except Master_SubTopic.DoesNotExist:
+                resp = Response(203, 'subtopic doesnot exist')
+                return JsonResponse(resp,status = 203)
+            resp = Response(200,'template_section created successfully')
+            return JsonResponse(resp,status = 200)
+        else:
+            resp = Response(204,'Wrong key value')
+            return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Wrong Request')
+        return JsonResponse(resp, status = 405)
+
+@csrf_exempt
+def update_template_section(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id','section_id','subtopic_id','difficulty_id','no_question'}.issubset(data.keys()):
+            try:
+                section = Master_Section.objects.get(id = data['section_id'],is_available = True)
+                subtopic = Master_SubTopic.objects.get(id = data['subtopic_id'],is_available = True)
+                temp_section = Template_Section.objects.get(id = data['id'])
+                temp_section.section =section
+                temp_section.subtopic = subtopic
+                temp_section.difficulty_id = data['difficulty_id']
+                temp_section.no_questions = data['no_question'] 
+                temp_section.save()
+            except Template_Section.DoesNotExist:
+                resp = Response(203,'Template_Section doesnot exist')
+                return JsonResponse(resp,status = 203)
+            except Master_Section.DoesNotExist:
+                resp = Response(203,'section doesnot exist')
+                return JsonResponse(resp,status = 203)
+            except Master_SubTopic.DoesNotExist:
+                resp = Response(203, 'subtopic doesnot exist')
+                return JsonResponse(resp,status = 203)
+            resp = Response(200,'template_section updated successfully')
+            return JsonResponse(resp,status = 200)
+        else:
+            resp = Response(204,'Wrong key value')
+            return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Wrong Request')
+        return JsonResponse(resp, status = 405)
+
+@csrf_exempt
+def get_all_template_sections(request):
+    if request.method == 'POST':
+        template_sections_arr = []
+        template_sections_dict = {'data':template_sections_arr}
+        temp = {}
+        template_sections = Template_Section.objects.filter()
+        for template_section in template_sections:
+            section = template_section.section
+            subtopic = template_section.subtopic
+            temp = {
+                'id':template_section.id,
+                'difficulty_id':template_section.difficulty_id,
+                'section':{
+                    'id':section.id,
+                    },
+                'subtopic':{
+                    'id':subtopic.id,
+                }    
+            }
+            template_sections_arr.append(temp)
+        return JsonResponse(template_sections_dict,status = 200)
+    else:
+        resp = Response(405,'Wrong Request')
+        return JsonResponse(resp, status = 405)
+
+@csrf_exempt
+def delete_section_template(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id'}.issubset(data.keys()):
+            try:
+                temp_section = Template_Section.objects.get(id = data['id'])
+                temp_section.delete()
+            except Template_Section.DoesNotExist:
+                resp = Response(203,'Template_Section doesnot exist')
+                return JsonResponse(resp,status = 203)
+            resp = Response(200,'template_section deleted successfully')
+            return JsonResponse(resp,status = 200)
+        else:
+            resp = Response(204,'Wrong key value')
+            return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Wrong Request')
+        return JsonResponse(resp, status = 405)
+

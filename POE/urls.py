@@ -22,4 +22,5 @@ urlpatterns = [
     path('services/questions/',include('Questions.urls')),
     path('services/topics/',include('Topics.urls')),
     path('services/template/',include('Template.urls')),
+    path('services/exams/',include('Exams.urls'))
 ]
