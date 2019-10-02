@@ -113,7 +113,7 @@ def delete_exam(request):
                 exam = Master_Exam.objects.get(id = data['id'],is_available = True)
                 exam.is_available = False
                 exam.save()
-                resp = Response(200,'exam deletedd successfully')
+                resp = Response(200,'exam deleted successfully')
                 return JsonResponse(resp,status = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')

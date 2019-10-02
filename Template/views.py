@@ -257,7 +257,7 @@ def update_template_section(request):
     else:
         resp = Response(405,'Wrong Request')
         return JsonResponse(resp, status = 405)
-
+#update in future
 @csrf_exempt
 def get_all_template_sections(request):
     if request.method == 'POST':
@@ -290,6 +290,7 @@ def delete_section_template(request):
         data = json.loads(request.body.decode('utf-8'))
         if {'id'}.issubset(data.keys()):
             try:
+
                 temp_section = Template_Section.objects.get(id = data['id'])
                 temp_section.delete()
             except Template_Section.DoesNotExist:

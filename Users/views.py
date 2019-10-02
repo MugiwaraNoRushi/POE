@@ -36,7 +36,7 @@ def validate(request):
                 return JsonResponse(resp,status = 405)
 
 #-----------------------------------------------------------------------------------------
-
+#RANGE DO TO 6
 @csrf_exempt
 def signup(request):
         if request.method == 'POST':
