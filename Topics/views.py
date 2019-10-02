@@ -53,7 +53,6 @@ def create_subtopic(request):
 @csrf_exempt
 def get_all_topics(request):
     if request.method == 'POST':
-        data = json.loads(request.body.decode('utf-8'))
         topics_arr = []
         topics_dict = {'data':topics_arr}
         topics = Master_Topic.objects.all()
@@ -71,7 +70,6 @@ def get_all_topics(request):
 @csrf_exempt
 def get_all_subtopics(request):
     if request.method == 'POST':
-        data = json.loads(request.body.decode('utf-8'))
         subtopics_arr = []
         subtopics_dict = {'data':subtopics_arr}
         subtopics = Master_SubTopic.objects.all()
