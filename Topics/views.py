@@ -76,7 +76,7 @@ def get_all_subtopics(request):
         for subtopic in subtopics:
             temp = {
                 'id':subtopic.id,
-                'text':subtopic.topic_text,
+                'text':subtopic.subtopic_text,
             }
             subtopics_arr.append(temp)
         return JsonResponse(subtopics_dict,status = 200)
