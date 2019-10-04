@@ -93,8 +93,8 @@ def delete_subtopic(request):
         data = json.loads(request.body.decode('utf-8'))
         if {'id'}.issubset(data.keys()):
             try:
-                subtopic = Master_SubTopic.objects.get(id = data['id'])
-                subtopic.is_avaible = False
+                subtopic = Master_SubTopic.objects.get(id = data['id'],is_available = True)
+                subtopic.is_available = False
                 subtopic.save()
                 resp = Response(200, "Deleted successfully")
                 return JsonResponse(resp, status = 200)
@@ -115,8 +115,8 @@ def delete_topic(request):
         data = json.loads(request.body.decode('utf-8'))
         if {'id'}.issubset(data.keys()):
             try:
-                topic = Master_Topic.objects.get(id = data['id'])
-                topic.is_avaible = False
+                topic = Master_Topic.objects.get(id = data['id'],is_available = True)
+                topic.is_available = False
                 topic.save()
                 resp = Response(200, "Deleted successfully")
                 return JsonResponse(resp, status = 200)
@@ -129,3 +129,7 @@ def delete_topic(request):
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
+
+#update topic and suptopic 
+#get single subtopic id and topic id 
+#get all subtopics ==>> include topic object

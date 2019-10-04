@@ -122,6 +122,76 @@ def delete_exam(request):
             resp = Response(204,'Wrong key value pair')
             return JsonResponse(resp,status = 204)
 
+@csrf_exempt
+def create_user_test(request):
+    if request.method == 'POST':
+        data =json.loads(request.body.decode('utf-8'))
+        if {'exam_id','user_id','status','duration'}.issubset(data.keys()):
+            try:
+                exam = Master_Exam.objects.get(id = data['exam_id'])
+                user = Master_Users.objects.get(id = data['user_id'])
+                user_test_status = User_Test_Status.objects.create(
+                    exam = exam,
+                    user = user,
+                    status = data['status'],
+                    duration = data['duration']
+                )
+                user_test_status.save()
+                resp = Response(200,'user_test_status created successfully')
+                return JsonResponse(resp,status = 200)
+            except Master_Exam.DoesNotExist:
+                resp = Response(203,'Exam doesnot exists')
+                return JsonResponse(resp,status = 203)
+            except Master_Users.DoesNotExist:
+                resp = Response(203,'User doesnot exists')
+                return JsonResponse(resp,status = 203)
+        else:
+            resp = Response(204,'Wrong key value pair')
+            return JsonResponse(resp,status = 204)
+#do u need to update the user ??
+@csrf_exempt
+def update_user_test(request):
+    if request.method == 'POST':
+        data =json.loads(request.body.decode('utf-8'))
+        if {'id','status','duration'}.issubset(data.keys()):
+            try:
+                user_test_status = User_Test_Status.objects.get(id = data['id'])
+                user_test_status.status = data['status']
+                user_test_status.duration = data['duration']
+                user_test_status.save()
+                resp = Response(200,'user_test_status updated successfully')
+                return JsonResponse(resp,status = 200)
+
+            except User_Test_Status.DoesNotExist:
+                resp = Response(203,'Exam doesnot exists')
+                return JsonResponse(resp,status = 203)
+            except Master_Exam.DoesNotExist:
+                resp = Response(203,'Exam doesnot exists')
+                return JsonResponse(resp,status = 203)
+            except Master_Users.DoesNotExist:
+                resp = Response(203,'User doesnot exists')
+                return JsonResponse(resp,status = 203)
+        else:
+            resp = Response(204,'Wrong key value pair')
+            return JsonResponse(resp,status = 204)
+
+@csrf_exempt
+def delete_user_test(request):
+    if request.method == 'POST':
+        data =json.loads(request.body.decode('utf-8'))
+        if {'id'}.issubset(data.keys()):
+            try:
+                user_test_status = User_Test_Status.objects.get(id = data['id'])
+                user_test_status.delete()
+                resp = Response(200,'user_test_status deleted successfully')
+                return JsonResponse(resp,status = 200)
+            except User_Test_Status.DoesNotExist:
+                resp = Response(203,'Exam doesnot exists')
+                return JsonResponse(resp,status = 203)
+        else:
+            resp = Response(204,'Wrong key value pair')
+            return JsonResponse(resp,status = 204)
+
 
 #what to do with remaining tables
 #dynamic things remain
