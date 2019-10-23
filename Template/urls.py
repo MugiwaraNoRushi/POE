@@ -14,4 +14,7 @@ urlpatterns = [
     path('update/sectionwithtemplate/',update_template_section,name = 'update a template section'),
     path('get/all/sectionwithtemplates/',get_all_template_sections,name = 'fetch all section with templates'),
     path('delete/sectionwithtemplate/',delete_section_template,name = 'delete a section with template'),
+    path('activate/section/',activate_Section,name = 'activate a section'),
+    path('activate/template/',activate_Template,name = 'activate a template'),
+
 ]

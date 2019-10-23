@@ -113,6 +113,8 @@ def update_question(request):
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
 
+
+#WHAT to do in this get all and do we have to create an activate method for this.
 @csrf_exempt
 def get_all_questions(request):
     if request.method == "POST":

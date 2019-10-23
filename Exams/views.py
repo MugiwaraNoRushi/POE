@@ -50,6 +50,7 @@ def get_exam(request):
                 exam = Master_Exam.objects.get(id = data['id'],is_available = True)
                 group = exam.group
                 template = exam.template 
+                admin = group.group_admin
                 exam_dict = {
                     'name':exam.exam_name,
                     'duration':exam.exam_duration,
@@ -57,10 +58,17 @@ def get_exam(request):
                     'result_timestamp':exam.result_timestamp,
                     'is_enable':exam.is_enable,
                     'group':{
-                        "id":group.id
+                        "id":group.id,
+                        "group_name":group.group_name,
+                        'group_admin_id':admin.id,
+                        'is_available':group.is_available
                     },
                     "template":{
-                        'id':template.id
+                        'id':template.id,
+                        'name':template.template_name,
+                        'marks': template.template_marks,
+                        'duration': template.template_duration,
+                        'is_available': template.is_available
                     }
                 }
                 return JsonResponse(exam_dict,status = 200)
@@ -192,6 +200,6 @@ def delete_user_test(request):
             resp = Response(204,'Wrong key value pair')
             return JsonResponse(resp,status = 204)
 
-
+#do I have to create an activate method for exams, it does not make sense!!!!
 #what to do with remaining tables
 #dynamic things remain

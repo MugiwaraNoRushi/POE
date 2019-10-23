@@ -26,3 +26,5 @@ class User_Test_Status(models.Model):
     user = models.ForeignKey('Users.Master_Users',on_delete = models.SET_NULL,null = True)
     status = models.SmallIntegerField()
     duration = models.IntegerField()
+
+    

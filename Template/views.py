@@ -54,13 +54,14 @@ def get_all_Templates(request):
         templates_arr = []
         templates_dict = {'data':templates_arr}
         temp = {}
-        templates = Master_Template.objects.filter(is_available = True)
+        templates = Master_Template.objects.all()
         for template in templates:
             temp = {
                 'id':template.id,
                 'name':template.template_name,
                 'marks':template.template_marks,
-                'duration':template.template_duration
+                'duration':template.template_duration,
+                'is_available':template.is_available
             }
             templates_arr.append(temp)
         return JsonResponse(templates_dict,status = 200)
@@ -174,7 +175,7 @@ def get_all_Sections(request):
         sections_arr = []
         sections_dict = {'data':sections_arr}
         temp = {}
-        sections = Master_Section.objects.filter(is_available = True)
+        sections = Master_Section.objects.all()
         for section in sections:
             template = section.template
             temp = {
@@ -183,11 +184,13 @@ def get_all_Sections(request):
                 'marks':section.section_marks,
                 'duration':section.section_duration,
                 'negative_marks':section.negative_marks,
+                'is_available':section.is_available,
                 'template':{
                     'id':template.id,
                     'name':template.template_name,
                     'marks':template.template_marks,
-                    'duration':template.template_duration
+                    'duration':template.template_duration,
+                    'is_available':template.is_available,
                 }
             }
             sections_arr.append(temp)
@@ -267,15 +270,36 @@ def get_all_template_sections(request):
         template_sections = Template_Section.objects.filter()
         for template_section in template_sections:
             section = template_section.section
+            template = section.template
             subtopic = template_section.subtopic
+            topic = subtopic.topic
             temp = {
                 'id':template_section.id,
                 'difficulty_id':template_section.difficulty_id,
                 'section':{
                     'id':section.id,
+                    'name':section.section_name,
+                    'marks':section.section_marks,
+                    'duration':section.section_duration,
+                    'negative_marks':section.negative_marks,
+                    'is_available' : section.is_available,
+                    'template':{
+                        'id':template.id,
+                        'name':template.template_marks,
+                        'marks':template.template_marks,
+                        'duration':template.template_duration,
+                        'is_available':template.is_available,
+                        }
                     },
                 'subtopic':{
                     'id':subtopic.id,
+                    'text':subtopic.subtopic_text,
+                    'is_available':subtopic.is_available,
+                    'topic':{
+                        'id':topic.id,
+                        'text':topic.topic_text,
+                        'is_available':topic.is_available
+                    }
                 }    
             }
             template_sections_arr.append(temp)
@@ -304,4 +328,47 @@ def delete_section_template(request):
     else:
         resp = Response(405,'Wrong Request')
         return JsonResponse(resp, status = 405)
+        
 
+@csrf_exempt
+def activate_Template(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id'}.issubset(data.keys()):
+            try:
+                template = Master_Template.objects.get(id = data['id'],is_available = False)
+                template.is_available = True
+                template.save()
+                resp = Response(200,'template updated successfully')
+                return JsonResponse(resp, status = 200)
+            except:
+                resp = Response(203,'template doesnot exist')
+                return JsonResponse(resp,status = 203)
+        else:
+            resp = Response(204,'Wrong key value')
+            return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Wrong Request')
+        return JsonResponse(resp, status = 405)
+
+    
+@csrf_exempt
+def activate_Section(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id'}.issubset(data.keys()):
+            try:
+                section = Master_Section.objects.get(id = data['id'],is_available = False)
+                section.is_available = True
+                section.save()
+                resp = Response(200,'section updated successfully')
+                return JsonResponse(resp, status = 200)
+            except:
+                resp = Response(203,'section doesnot exist')
+                return JsonResponse(resp,status = 203)
+        else:
+            resp = Response(204,'Wrong key value')
+            return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Wrong Request')
+        return JsonResponse(resp, status = 405)

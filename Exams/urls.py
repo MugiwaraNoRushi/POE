@@ -10,3 +10,4 @@ urlpatterns = [
     path('update/user/test/status/',update_user_test,name = 'update a user test status'),
     path('delete/user/test/status/',delete_user_test,name = 'delete a user test status'),
 ]
+

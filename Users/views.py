@@ -66,7 +66,7 @@ def signup(request):
                         city_obj = Master_City.objects.get(id = city_id)
                         #city what to do if it does not exists
                         #user type decide 
-                        random_num = int(random.random()*1000000)
+                        random_num = int(random.randint(100000,999999))
                         user = Temp_Master_Users.objects.create(
                                 username = data['username'],
                                 password = data['password'],
@@ -298,7 +298,7 @@ def add_user_to_group(request):
 @csrf_exempt
 def get_all_cities(request):
         if request.method == "POST":
-                cities = Master_City.objects.filter(is_available = True)
+                cities = Master_City.objects.all()
                 arr_dict = []
                 data_dict = {
                         'data':arr_dict
@@ -306,7 +306,8 @@ def get_all_cities(request):
                 for city in cities:
                         temp_dict = {
                                 'id':city.id,
-                                'name':city.city_text
+                                'name':city.city_text,
+                                'is_available':city.is_available
                         }
                         arr_dict.append(temp_dict)
                 return JsonResponse(data_dict,status = 200)
@@ -319,11 +320,37 @@ def delete_city(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
                 if {'id'}.issubset(data.keys()):
-                        city = Master_City.objects.get(id = data['id'])
-                        city.is_available = False
-                        city.save()
-                        resp = Response(200,"City deleted successfuly")
-                        return JsonResponse(resp,status = 200)
+                        try:
+                                city = Master_City.objects.get(id = data['id'],is_available = True)
+                                city.is_available = False
+                                city.save()
+                                resp = Response(200,"City deleted successfuly")
+                                return JsonResponse(resp,status = 200)
+                        except:
+                                resp = Response(203,'city doesnot exist')
+                                return JsonResponse(resp,status = 200)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)   
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+#activate method 1 
+@csrf_exempt
+def activate_city(request):
+        if request.method == 'POST':
+                data = json.loads(request.body.decode('utf-8'))
+                if {'id'}.issubset(data.keys()):
+                        try:
+                                city = Master_City.objects.get(id = data['id'],is_available = False)
+                                city.is_available = True
+                                city.save()
+                                resp = Response(200,"City activated successfuly")
+                                return JsonResponse(resp,status = 200)
+                        except:
+                                resp = Response(203,'city doesnot exist')
+                                return JsonResponse(resp,status = 200)
                 else:
                         resp = Response(204,"Wrong key value")
                         return JsonResponse(resp,status = 204)   
