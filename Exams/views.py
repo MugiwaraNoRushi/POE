@@ -38,7 +38,9 @@ def create_exam(request):
         else:
             resp = Response(204,'Wrong key value pair')
             return JsonResponse(resp,status = 204)
-
+    else:
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 #decide the parameters to return 
 @csrf_exempt
@@ -78,6 +80,9 @@ def get_exam(request):
         else:
             resp = Response(204,'Wrong key value pair')
             return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def update_exam(request):
@@ -111,6 +116,9 @@ def update_exam(request):
         else:
             resp = Response(204,'Wrong key value pair')
             return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def delete_exam(request):
@@ -129,6 +137,10 @@ def delete_exam(request):
         else:
             resp = Response(204,'Wrong key value pair')
             return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
+
 
 @csrf_exempt
 def create_user_test(request):
@@ -156,6 +168,9 @@ def create_user_test(request):
         else:
             resp = Response(204,'Wrong key value pair')
             return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 #do u need to update the user ??
 @csrf_exempt
 def update_user_test(request):
@@ -182,6 +197,9 @@ def update_user_test(request):
         else:
             resp = Response(204,'Wrong key value pair')
             return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def delete_user_test(request):
@@ -199,6 +217,9 @@ def delete_user_test(request):
         else:
             resp = Response(204,'Wrong key value pair')
             return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 #do I have to create an activate method for exams, it does not make sense!!!!
 #what to do with remaining tables

@@ -20,6 +20,7 @@ class User_Question_Assigned(models.Model):
 class User_Question_Response(models.Model):
     section_question = models.ForeignKey('User_Question_Assigned',on_delete = models.SET_NULL,null = True)
     option = models.ForeignKey('Questions.Master_Option',on_delete = models.SET_NULL,null = True)
+    marked = models.BooleanField(default = False)
 
 class User_Test_Status(models.Model):
     exam = models.ForeignKey('Master_Exam',on_delete = models.SET_NULL,null = True)

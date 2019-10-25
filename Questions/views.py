@@ -123,35 +123,10 @@ def get_all_questions(request):
             subtopic = Master_SubTopic.objects.get(id = data['subtopic_id'])
             questions = Master_Question.objects.filter(subtopic = subtopic,is_available = True)
             arr_dict = []
-            correct_option_arr = []
-            option_arr = []
             questions_data = {'data':arr_dict}
             try:
                 for question in questions:
-                    options = Master_Option.objects.filter(question = question,is_available = True)
-                    for option in options:
-                        option_dict = {
-                            'option_text':option.option_text,
-                            'option_id':option.id
-                        }
-                        option_arr.append(option_dict)
-                    correct_options = Master_Correct_Option.objects.filter(question = question,is_available = True)
-                    for correct_option in correct_options:
-                        correct_option_dict = {
-                            'correct_option_text':str(correct_option.option.option_text),
-                            'correct_option_id':correct_option.id
-                        }
-                        correct_option_arr.append(correct_option_dict)
-                    temp_dict = {
-                        'question_text':question.question_text,
-                        'question_marks':question.question_marks,
-                        'question_id':question.id,
-                        'question_type':question.question_type,
-                        'question_difficulty':question.difficulty,
-                        'options':option_arr,
-                        'correct_options':correct_option_arr
-                    }
-                    arr_dict.append(temp_dict)
+                    arr_dict.append(get_single_question(question))
                 return JsonResponse(questions_data,status = 200)
             except:
                 resp = Response('Something went wrong GEN 1',Exception)
@@ -163,3 +138,36 @@ def get_all_questions(request):
     else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
+
+
+#-----------------UTILS----------------------------------------------------------------------------
+
+
+#get single question
+def get_single_question(question):
+    option_arr = []
+    correct_option_arr = []
+    options = Master_Option.objects.filter(question = question,is_available = True)
+    for option in options:
+        option_dict = {
+            'option_text':option.option_text,
+            'option_id':option.id
+        }
+        option_arr.append(option_dict)
+    correct_options = Master_Correct_Option.objects.filter(question = question,is_available = True)
+    for correct_option in correct_options:
+        correct_option_dict = {
+            'correct_option_text':str(correct_option.option.option_text),
+            'correct_option_id':correct_option.id
+        }
+        correct_option_arr.append(correct_option_dict)
+    question_dict = {
+        'question_text':question.question_text,
+        'question_marks':question.question_marks,
+        'question_id':question.id,
+        'question_type':question.question_type,
+        'question_difficulty':question.difficulty,
+        'options':option_arr,
+        'correct_options':correct_option_arr
+    }
+    return question_dict
