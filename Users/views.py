@@ -211,25 +211,8 @@ def get_user(request):
                 if {'username'}.issubset(data.keys()):
                         try:
                                 user_obj = User_Credentials.objects.get(user_name =  data['username'])
-                                user = user_obj.user
-                                city = user.city
-                                user_dict = {
-                                        'firstName':user.first_name,
-                                        'lastName' : user.last_name,
-                                        'middleName':user.middle_name,
-                                        'userId':user.id,
-                                        'email':user.email,
-                                        'phone':user.phone,
-                                        'address1':user.address1,
-                                        'address2':user.address2,
-                                        'userTypeId':user.user_type_id,
-                                        'city':{
-                                        'name':city.city_text,
-                                        'id' : city.id,
-                                        },
-                                
-                                }                               
-                                return JsonResponse(user_dict,status = 200)
+                                user = user_obj.user           
+                                return JsonResponse(get_user_dict(user),status = 200)
                                 
                         except User_Credentials.DoesNotExist:
                                 resp = Response(203, "username doesnot exists")
@@ -406,24 +389,89 @@ def get_all_users(request):
                         'data':arr_dict
                 }
                 for user in users:
-                        city = user.city
-                        user_dict = {
-                                'firstName':user.first_name,
-                                'lastName' : user.last_name,
-                                'middleName':user.middle_name,
-                                'userId':user.id,
-                                'email':user.email,
-                                'phone':user.phone,
-                                'address1':user.address1,
-                                'address2':user.address2,
-                                'userTypeId':user.user_type_id,
-                                'city':{
-                                'name':city.city_text,
-                                'id' : city.id,
-                                },
-                        }
-                        arr_dict.append(user_dict)
+                        arr_dict.append(get_user_dict(user))
                 return JsonResponse(data_dict,status = 200)                    
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
+
+
+@csrf_exempt
+def get_group(request):
+        if request.method == 'POST':
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id'}.issubset(data.keys()):
+                        try:
+                                group = Master_Groups.objects.get(id = data['group_id'])
+                                return JsonResponse(get_group_dict(group), status = 200)
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status = 203)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)   
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def get_all_groups(request):
+        if request.method == 'POST':
+                groups = Master_Groups.objects.all()
+                arr_dict = []
+                data_dict = {
+                        'data':arr_dict
+                }
+                for group in groups:
+                        arr_dict.append(get_group_dict(group))
+                return JsonResponse(data_dict,status = 200) 
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+
+
+
+
+#_-----------------------UTILS--------------------------------------------------------------
+
+
+def get_group_dict(group):
+
+        group_mappings = User_Group_Mapping.objects.filter(group = group)
+        group_admin_dict = get_user_dict(group.group_admin)
+        user_arr = []
+        group_dict = {
+                "group_id":group.id,
+                "group_name":group.group_name,
+                "is_available":group.is_available,
+                "group_admin":group_admin_dict,
+                "users_in_group":user_arr
+        }
+        for group_mapping in group_mappings:
+                user = group_mapping.user
+                user_arr.append(get_user_dict(user))
+        return group_dict
+                
+
+
+
+
+def get_user_dict(user):
+        city = user.city
+        user_dict = {
+                'firstName':user.first_name,
+                'lastName' : user.last_name,
+                'middleName':user.middle_name,
+                'userId':user.id,
+                'email':user.email,
+                'phone':user.phone,
+                'address1':user.address1,
+                'address2':user.address2,
+                'userTypeId':user.user_type_id,
+                'city':{
+                'name':city.city_text,
+                'id' : city.id,
+                },
+        }
+        return user_dict   

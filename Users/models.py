@@ -45,4 +45,4 @@ class Master_Groups(models.Model):
 class User_Group_Mapping(models.Model):
     user = models.ForeignKey('Master_Users',on_delete = models.SET_NULL, null = True)
     group = models.ForeignKey('Master_Groups',on_delete = models.SET_NULL, null = True)
-    #creater of the group remains !! 
+    

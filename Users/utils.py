@@ -7,6 +7,8 @@ def Response(status,msg):
     }
     return dict_resp
 
+
+
 #still to implement
 def authenticate_client(data):
     if (data['username'] == "username" and data['password'] == 'password'):
