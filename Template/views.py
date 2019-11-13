@@ -372,3 +372,63 @@ def activate_Section(request):
     else:
         resp = Response(405,'Wrong Request')
         return JsonResponse(resp, status = 405)
+
+@csrf_exempt
+def get_Section(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id'}.issubset(data.keys()):
+            try:
+                section = Master_Section.objects.get(id = data['id'])
+                template = section.template
+                section_dict = {
+                    'id':section.id,
+                    'name':section.section_name,
+                    'marks':section.section_marks,
+                    'duration':section.section_duration,
+                    'negative_marks':section.negative_marks,
+                    'is_available':section.is_available,
+                    'template':{
+                        'id':template.id,
+                        'name':template.template_name,
+                        'marks':template.template_marks,
+                        'duration':template.template_duration,
+                        'is_available':template.is_available,
+                    }
+                }
+                return JsonResponse(section_dict, status = 200)
+            except:
+                resp = Response(203,'section doesnot exist')
+                return JsonResponse(resp,status = 203)
+        else:
+            resp = Response(204,'Wrong key value')
+            return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Wrong Request')
+        return JsonResponse(resp, status = 405)
+
+@csrf_exempt
+def get_Template(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id'}.issubset(data.keys()):
+            try:
+                template = Master_Template.objects.get(id = data['id'])
+                temp = {
+                'id':template.id,
+                'name':template.template_name,
+                'marks':template.template_marks,
+                'duration':template.template_duration,
+                'is_available':template.is_available
+                }
+                return JsonResponse(temp, status = 200)
+            except:
+                resp = Response(203,'template doesnot exist')
+                return JsonResponse(resp,status = 203)
+        else:
+            resp = Response(204,'Wrong key value')
+            return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Wrong Request')
+        return JsonResponse(resp, status = 405)
+
