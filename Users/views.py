@@ -226,7 +226,24 @@ def get_user(request):
                 return JsonResponse(resp,status = 405)
 
 
+@csrf_exempt
+def get_all_users(request):
+        if request.method == 'POST': 
+                users = Master_Users.objects.all()
+                arr_dict = []
+                data_dict = {
+                        'data':arr_dict
+                }
+                for user in users:
+                        arr_dict.append(get_user_dict(user))
+                return JsonResponse(data_dict,status = 200)                    
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
 #----------------------------------------------------------------------------------------
+
+#GROUPS
 
 @csrf_exempt
 def create_group(request):
@@ -258,7 +275,11 @@ def add_user_to_group(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
                 if {'group_id','user_array'}.issubset(data.keys()):
-                        group_obj = Master_Groups.objects.get(id = data['group_id'])
+                        try:
+                                group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status = 203)
                         user_arr = data['user_array']
                         for i in range(0,len(user_arr)):
                                 user_obj = Master_Users.objects.get(id = user_arr[i])
@@ -273,6 +294,134 @@ def add_user_to_group(request):
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
+
+
+@csrf_exempt
+def get_group(request):
+        if request.method == 'POST':
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id'}.issubset(data.keys()):
+                        try:
+                                group = Master_Groups.objects.get(id = data['group_id'])
+                                return JsonResponse(get_group_dict(group), status = 200)
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status = 203)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)   
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def get_all_groups(request):
+        if request.method == 'POST':
+                groups = Master_Groups.objects.all()
+                arr_dict = []
+                data_dict = {
+                        'data':arr_dict
+                }
+                for group in groups:
+                        arr_dict.append(get_group_dict(group))
+                return JsonResponse(data_dict,status = 200) 
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def remove_user_from_group(request):
+
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id','user_array'}.issubset(data.keys()):
+                        try:
+                                group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status = 203)
+
+                        user_arr = data['user_array']
+                        for i in range(0,len(user_arr)):
+                                user_obj = Master_Users.objects.get(id = user_arr[i],is_available = True)
+                                group_mapping = User_Group_Mapping.objects.get(user = user_obj,group = group_obj)
+                                group_mapping.delete()
+                        resp = Response(200,"Users deleted successfully")
+                        return JsonResponse(resp,status = 200)
+
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405) 
+
+@csrf_exempt
+def modify_group(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id','group_name'}.issubset(data.keys()):
+                        try:
+                                group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status = 203)
+                        
+                        group_obj.group_name = data['group_name']
+                        group_obj.save()
+                        resp = Response(200,'Group modified successfully ')
+                        return JsonResponse(resp,200)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405) 
+
+
+@csrf_exempt
+def delete_group(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id'}.issubset(data.keys()):
+                        try:
+                                group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status = 203)
+                        
+                        group_obj.is_available = False
+                        group_obj.save()
+                        resp = Response(200,'Group deleted successfully ')
+                        return JsonResponse(resp,200)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405) 
+
+@csrf_exempt
+def activate_group(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id'}.issubset(data.keys()):
+                        try:
+                                group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = False)
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status = 203)
+                        
+                        group_obj.is_available = True
+                        group_obj.save()
+                        resp = Response(200,'Group activated successfully ')
+                        return JsonResponse(resp,200)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405) 
 
 
 #--------------------------------------------------------------------------------------------------
@@ -379,58 +528,6 @@ def add_city(request):
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
-
-@csrf_exempt
-def get_all_users(request):
-        if request.method == 'POST': 
-                users = Master_Users.objects.all()
-                arr_dict = []
-                data_dict = {
-                        'data':arr_dict
-                }
-                for user in users:
-                        arr_dict.append(get_user_dict(user))
-                return JsonResponse(data_dict,status = 200)                    
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
-
-
-@csrf_exempt
-def get_group(request):
-        if request.method == 'POST':
-                data = json.loads(request.body.decode('utf-8'))
-                if {'group_id'}.issubset(data.keys()):
-                        try:
-                                group = Master_Groups.objects.get(id = data['group_id'])
-                                return JsonResponse(get_group_dict(group), status = 200)
-                        except:
-                                resp = Response(203,'Group doesnot exists')
-                                return JsonResponse(resp,status = 203)
-                else:
-                        resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)   
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
-
-@csrf_exempt
-def get_all_groups(request):
-        if request.method == 'POST':
-                groups = Master_Groups.objects.all()
-                arr_dict = []
-                data_dict = {
-                        'data':arr_dict
-                }
-                for group in groups:
-                        arr_dict.append(get_group_dict(group))
-                return JsonResponse(data_dict,status = 200) 
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
-
-
-
 
 
 #_-----------------------UTILS--------------------------------------------------------------

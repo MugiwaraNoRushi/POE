@@ -17,5 +17,5 @@ urlpatterns = [
     path('activate/section/',activate_Section,name = 'activate a section'),
     path('activate/template/',activate_Template,name = 'activate a template'),
     path('get/template/',get_Template,name = 'get single template'),
-    path('get/section/',get_Section,name = 'get a single section')
+    path('get/section/',get_Section,name = 'get a single section'),
 ]
