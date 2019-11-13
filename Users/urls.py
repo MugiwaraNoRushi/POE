@@ -16,5 +16,6 @@ urlpatterns = [
     path('add/city/',add_city,name = 'add city'),
     path('delete/city/',delete_city,name = 'delete city'),
     path('change/city/',modify_city,name = 'change city'),
-    path('activate/city/',activate_city,name = 'activate a city')
+    path('activate/city/',activate_city,name = 'activate a city'),
+    path('get/all/users/',get_all_users,name = 'get all users')
 ]

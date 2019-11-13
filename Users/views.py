@@ -217,7 +217,7 @@ def get_user(request):
                                         'firstName':user.first_name,
                                         'lastName' : user.last_name,
                                         'middleName':user.middle_name,
-                                        'id':user.id,
+                                        'userId':user.id,
                                         'email':user.email,
                                         'phone':user.phone,
                                         'address1':user.address1,
@@ -257,7 +257,8 @@ def create_group(request):
                                 "name":group_obj.group_name,
                                 "id":group_obj.id,
                         }
-                        return JsonResponse(group_dict,status = 200)
+                        resp = Response(200,'Created Successfully')
+                        return JsonResponse(resp,status = 200)
                 else:
                         resp = Response(204,"Wrong key value")
                         return JsonResponse(resp,status = 204)
@@ -396,3 +397,33 @@ def add_city(request):
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
 
+@csrf_exempt
+def get_all_users(request):
+        if request.method == 'POST': 
+                users = Master_Users.objects.all()
+                arr_dict = []
+                data_dict = {
+                        'data':arr_dict
+                }
+                for user in users:
+                        city = user.city
+                        user_dict = {
+                                'firstName':user.first_name,
+                                'lastName' : user.last_name,
+                                'middleName':user.middle_name,
+                                'userId':user.id,
+                                'email':user.email,
+                                'phone':user.phone,
+                                'address1':user.address1,
+                                'address2':user.address2,
+                                'userTypeId':user.user_type_id,
+                                'city':{
+                                'name':city.city_text,
+                                'id' : city.id,
+                                },
+                        }
+                        arr_dict.append(user_dict)
+                return JsonResponse(data_dict,status = 200)                    
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
