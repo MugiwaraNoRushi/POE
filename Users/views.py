@@ -1,6 +1,6 @@
 import json
 import pyDes
-import random 
+import random
 from base64 import b64decode
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime,timezone,timedelta
@@ -17,7 +17,7 @@ def validate(request):
                 data = json.loads(request.body.decode('utf-8'))
                 keys = set(data.keys())
                 if {'username','password'}.issubset(keys):
-                        username = data['username']  
+                        username = data['username']
                         password = data['password']
                 else:
                         resp = Response(204,"Wrong key value")
@@ -45,13 +45,13 @@ def signup(request):
                 keys = set(data.keys())
                 if {'f_name','m_name','l_name','address1','address2','email','phone','city_id','username','password','user_type'}.issubset(keys):
                         email = data['email']
-                        #if email already exists !! 
+                        #if email already exists !!
                         try:
                                 temp = Temp_Master_Users.objects.get(email = email)
                                 now = datetime.now(timezone.utc)
                                 difference = timedelta(days = 0,hours = 1,minutes = 0 )
                                 if (now - temp.entry_time < difference):
-                                #can also change status to show this 
+                                #can also change status to show this
                                         resp = Response(203, "Email already resgistered and check mail")
                                         return JsonResponse(resp,status = 203)
                         except Temp_Master_Users.DoesNotExist:
@@ -65,7 +65,7 @@ def signup(request):
                         city_id = data['city_id']
                         city_obj = Master_City.objects.get(id = city_id)
                         #city what to do if it does not exists
-                        #user type decide 
+                        #user type decide
                         random_num = int(random.randint(100000,999999))
                         user = Temp_Master_Users.objects.create(
                                 username = data['username'],
@@ -84,8 +84,8 @@ def signup(request):
                                 )
                         user.save()
                         #what to do next
-                        #call the check registration_number method !! 
-                        #must make a new function 
+                        #call the check registration_number method !!
+                        #must make a new function
                         val_dict = {
                                 "email" : email,
                                 "code":random_num
@@ -95,7 +95,7 @@ def signup(request):
                 else:
                        resp = Response(204,"Wrong key value")
                        return JsonResponse(resp,status = 204)
-                
+
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -104,7 +104,7 @@ def signup(request):
 
 @csrf_exempt
 def validate_registration(request):
-        if request.method == "POST":      
+        if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
                 #email and registration number how to fetch them !!!!
                 email = data['email']
@@ -115,7 +115,7 @@ def validate_registration(request):
                         user_obj = Temp_Master_Users.objects.get(email = email,registration_code = registration_number)
                         now = datetime.now(timezone.utc)
                         reg_time = user_obj.entry_time
-                        #find a proper difference !! 
+                        #find a proper difference !!
                         difference = timedelta(days = 0,hours = 1,minutes = 0 )
                         if (now - reg_time < difference):
                                 master_user_obj = Master_Users.objects.create(
@@ -135,7 +135,7 @@ def validate_registration(request):
                                         user_name = user_obj.username,
                                         password = user_obj.password,
                                         user = master_user_obj
-                                )  
+                                )
                                 user_cred.save()
                                 user_obj.delete()
                                 resp = Response(200,"Your account has been created successfully !")
@@ -205,19 +205,40 @@ def change_password(request):
 #----------------------------------------------------------------------------------------
 
 @csrf_exempt
+def get_user_by_id(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'user_id'}.issubset(data.keys()):
+                        try:
+                                user_obj = User_Credentials.objects.get(id = data['user_id'])
+                                user = user_obj.user
+                                return JsonResponse(get_user_dict(user),status = 200)
+
+                        except User_Credentials.DoesNotExist:
+                                resp = Response(203, "user doesnot exists")
+                                return JsonResponse(resp,status = 203)
+
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
 def get_user(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
                 if {'username'}.issubset(data.keys()):
                         try:
                                 user_obj = User_Credentials.objects.get(user_name =  data['username'])
-                                user = user_obj.user           
+                                user = user_obj.user
                                 return JsonResponse(get_user_dict(user),status = 200)
-                                
+
                         except User_Credentials.DoesNotExist:
                                 resp = Response(203, "username doesnot exists")
                                 return JsonResponse(resp,status = 203)
-                
+
                 else:
                         resp = Response(204,"Wrong key value")
                         return JsonResponse(resp,status = 204)
@@ -228,7 +249,7 @@ def get_user(request):
 
 @csrf_exempt
 def get_all_users(request):
-        if request.method == 'POST': 
+        if request.method == 'POST':
                 users = Master_Users.objects.all()
                 arr_dict = []
                 data_dict = {
@@ -236,7 +257,56 @@ def get_all_users(request):
                 }
                 for user in users:
                         arr_dict.append(get_user_dict(user))
-                return JsonResponse(data_dict,status = 200)                    
+                return JsonResponse(data_dict,status = 200)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def delete_user(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'user_id'}.issubset(data.keys()):
+                        try:
+                                user_obj = Master_Users.objects.get(id = data['user_id'])
+                                user_cred_obj = User_Credentials.objects.get(user = user_obj)
+                        except:
+                                resp = Response(203,'User does not exists')
+                                return JsonResponse(resp,status = 203)
+
+                        user_obj.is_available = False
+                        user_obj.save()
+
+                        user_cred_obj.is_active = False
+                        user_cred_obj.save()
+
+                        resp = Response(200,'User deleted successfully ')
+                        return JsonResponse(resp,status = 200)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def activate_user(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'user_id'}.issubset(data.keys()):
+                        try:
+                                user_obj = Master_Users.objects.get(id = data['user_id'])
+                        except:
+                                resp = Response(203,'User does not exists')
+                                return JsonResponse(resp,status = 203)
+
+                        user_obj.is_available = True
+                        user_obj.save()
+                        resp = Response(200,'User activated successfully ')
+                        return JsonResponse(resp,status = 200)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -270,11 +340,47 @@ def create_group(request):
 
 #-------------------------------------------------------------------------------------------------
 
+
+@csrf_exempt
+def get_group(request):
+        if request.method == 'POST':
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id'}.issubset(data.keys()):
+                        try:
+                                group = Master_Groups.objects.get(id = data['group_id'])
+                                return JsonResponse(get_group_dict(group), status = 200)
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status = 203)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def get_all_groups(request):
+        if request.method == 'POST':
+                groups = Master_Groups.objects.all()
+                arr_dict = []
+                data_dict = {
+                        'data':arr_dict
+                }
+                for group in groups:
+                        arr_dict.append(get_group_dict(group))
+                return JsonResponse(data_dict,status = 200)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+
 @csrf_exempt
 def add_user_to_group(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
                 if {'group_id','user_array'}.issubset(data.keys()):
+                        print(data['user_array'])
                         try:
                                 group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
                         except:
@@ -295,39 +401,6 @@ def add_user_to_group(request):
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
 
-
-@csrf_exempt
-def get_group(request):
-        if request.method == 'POST':
-                data = json.loads(request.body.decode('utf-8'))
-                if {'group_id'}.issubset(data.keys()):
-                        try:
-                                group = Master_Groups.objects.get(id = data['group_id'])
-                                return JsonResponse(get_group_dict(group), status = 200)
-                        except:
-                                resp = Response(203,'Group doesnot exists')
-                                return JsonResponse(resp,status = 203)
-                else:
-                        resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)   
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
-
-@csrf_exempt
-def get_all_groups(request):
-        if request.method == 'POST':
-                groups = Master_Groups.objects.all()
-                arr_dict = []
-                data_dict = {
-                        'data':arr_dict
-                }
-                for group in groups:
-                        arr_dict.append(get_group_dict(group))
-                return JsonResponse(data_dict,status = 200) 
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def remove_user_from_group(request):
@@ -354,7 +427,68 @@ def remove_user_from_group(request):
                         return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405) 
+                return JsonResponse(resp,status = 405)
+
+
+@csrf_exempt
+def get_users_from_group(request):
+
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id'}.issubset(data.keys()):
+                        try:
+                                group_obj = Master_Groups.objects.get(id = data['group_id'])
+                                user_group_mappings = User_Group_Mapping.objects.filter(group = group_obj)
+
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status = 203)
+
+                        arr_dict = []
+                        data_dict = {
+                            'data':arr_dict
+                        }
+                        for i in range(0,len(user_group_mappings)):
+                                user_obj = user_group_mappings[i].user
+                                arr_dict.append(get_user_dict(user_obj))
+
+                        return JsonResponse(data_dict,status = 200)
+
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def get_groups_from_user(request):
+        if request.method == 'POST':
+                data = json.loads(request.body.decode('utf-8'))
+                if {'user_id'}.issubset(data.keys()):
+                        try:
+                            user_obj = Master_Users.objects.get(id = data['user_id'])
+                            user_group_mappings = User_Group_Mapping.objects.filter(user = user_obj)
+
+                        except:
+                                resp = Response(203,'Groups do not exists')
+                                return JsonResponse(resp,status = 203)
+
+                        arr_dict = []
+                        data_dict = {
+                            'data':arr_dict
+                        }
+                        for i in range(0,len(user_group_mappings)):
+                                group_obj = user_group_mappings[i].group
+                                arr_dict.append(get_group_dict(group_obj))
+
+                        return JsonResponse(data_dict,status = 200)
+                else:
+                        resp = Response(204,"Wrong key value")
+                        return JsonResponse(resp,status = 204)
+        else:
+                resp = Response(405,'Bad Request!!')
+                return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def modify_group(request):
@@ -362,21 +496,21 @@ def modify_group(request):
                 data = json.loads(request.body.decode('utf-8'))
                 if {'group_id','group_name'}.issubset(data.keys()):
                         try:
-                                group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
+                                group_obj = Master_Groups.objects.get(id = data['group_id'])
                         except:
-                                resp = Response(203,'Group doesnot exists')
+                                resp = Response(203,'Group does not exists')
                                 return JsonResponse(resp,status = 203)
-                        
+
                         group_obj.group_name = data['group_name']
                         group_obj.save()
                         resp = Response(200,'Group modified successfully ')
-                        return JsonResponse(resp,200)
+                        return JsonResponse(resp,status = 200)
                 else:
                         resp = Response(204,"Wrong key value")
                         return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405) 
+                return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
@@ -389,7 +523,7 @@ def delete_group(request):
                         except:
                                 resp = Response(203,'Group doesnot exists')
                                 return JsonResponse(resp,status = 203)
-                        
+
                         group_obj.is_available = False
                         group_obj.save()
                         resp = Response(200,'Group deleted successfully ')
@@ -399,7 +533,7 @@ def delete_group(request):
                         return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405) 
+                return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def activate_group(request):
@@ -411,7 +545,7 @@ def activate_group(request):
                         except:
                                 resp = Response(203,'Group doesnot exists')
                                 return JsonResponse(resp,status = 203)
-                        
+
                         group_obj.is_available = True
                         group_obj.save()
                         resp = Response(200,'Group activated successfully ')
@@ -421,12 +555,12 @@ def activate_group(request):
                         return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405) 
+                return JsonResponse(resp,status = 405)
 
 
 #--------------------------------------------------------------------------------------------------
 
-#CITIES !! 
+#CITIES !!
 
 @csrf_exempt
 def get_all_cities(request):
@@ -464,12 +598,12 @@ def delete_city(request):
                                 return JsonResponse(resp,status = 200)
                 else:
                         resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)   
+                        return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
 
-#activate method 1 
+#activate method 1
 @csrf_exempt
 def activate_city(request):
         if request.method == 'POST':
@@ -486,7 +620,7 @@ def activate_city(request):
                                 return JsonResponse(resp,status = 200)
                 else:
                         resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)   
+                        return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -503,7 +637,7 @@ def modify_city(request):
                         return JsonResponse(resp,status = 200)
                 else:
                         resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)   
+                        return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -524,7 +658,7 @@ def add_city(request):
                                 return JsonResponse(resp,status = 200)
                 else:
                         resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)   
+                        return JsonResponse(resp,status = 204)
         else:
                 resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
@@ -549,7 +683,7 @@ def get_group_dict(group):
                 user = group_mapping.user
                 user_arr.append(get_user_dict(user))
         return group_dict
-                
+
 
 
 
@@ -566,9 +700,10 @@ def get_user_dict(user):
                 'address1':user.address1,
                 'address2':user.address2,
                 'userTypeId':user.user_type_id,
+                'is_available': user.is_available,
                 'city':{
                 'name':city.city_text,
                 'id' : city.id,
                 },
         }
-        return user_dict   
+        return user_dict

@@ -167,8 +167,8 @@ def update_subtopic(request):
         if {'id','text','topic_id'}.issubset(data.keys()):
             try:
                 topic = Master_Topic.objects.get(id = data['topic_id'])
-                subtopic = Master_SubTopic.objects.get(id = data['id'],is_available = True)
-                subtopic.text = data['text']
+                subtopic = Master_SubTopic.objects.get(id = data['id'])
+                subtopic.subtopic_text = data['text']
                 subtopic.topic = topic
                 subtopic.save()
                 resp = Response(200, "Updated successfully")
@@ -198,9 +198,11 @@ def get_subtopic(request):
                 subtopic_dict = {
                     'id':subtopic.id,
                     'text':subtopic.subtopic_text,
+                    'is_available':subtopic.is_available,
                     'topic':{
                         'id':topic.id,
-                        'text':topic.topic_text
+                        'text':topic.topic_text,
+                        'is_available':topic.is_available
                     }
                 }
                 return JsonResponse(subtopic_dict,status = 200)
@@ -221,11 +223,13 @@ def get_topic(request):
         data = json.loads(request.body.decode('utf-8'))
         if {'id'}.issubset(data.keys()):
             try:
-                topic = Master_Topic.objects.get(id = data['id'],is_available = True)
+                topic = Master_Topic.objects.get(id = data['id'])
                 topic_dict = {
                     'id':topic.id,
-                    'text':topic.topic_text
+                    'text':topic.topic_text,
+                    'is_available':topic.is_available
                 }
+                return JsonResponse(topic_dict,status = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
                 return JsonResponse(resp,status = 203)
@@ -238,8 +242,8 @@ def get_topic(request):
 
 
 
-#update topic and suptopic 
-#get single subtopic id and topic id 
+#update topic and suptopic
+#get single subtopic id and topic id
 #get all subtopics ==>> include topic object
 
 

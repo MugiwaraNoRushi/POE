@@ -2,7 +2,7 @@ from django.db import models
 
 class Master_Exam(models.Model):
     exam_name = models.CharField(max_length = 255)
-    exam_duration = models.TimeField()
+    exam_duration = models.IntegerField()
     group = models.ForeignKey('Users.Master_Groups',on_delete = models.SET_NULL,null = True)
     template = models.ForeignKey('Template.Master_Template',on_delete = models.SET_NULL,null = True)
     show_result_immediately = models.BooleanField(default= False)
@@ -27,5 +27,3 @@ class User_Test_Status(models.Model):
     user = models.ForeignKey('Users.Master_Users',on_delete = models.SET_NULL,null = True)
     status = models.SmallIntegerField()
     duration = models.IntegerField()
-
-    

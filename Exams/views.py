@@ -42,23 +42,26 @@ def create_exam(request):
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
-#decide the parameters to return 
+#decide the parameters to return
 @csrf_exempt
 def get_exam(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         if {'id'}.issubset(data.keys()):
             try:
-                exam = Master_Exam.objects.get(id = data['id'],is_available = True)
+                exam = Master_Exam.objects.get(id = data['id'])
                 group = exam.group
-                template = exam.template 
+                template = exam.template
                 admin = group.group_admin
                 exam_dict = {
+                    'id':exam.id,
                     'name':exam.exam_name,
                     'duration':exam.exam_duration,
                     'show_result_immediately':exam.show_result_immediately,
                     'result_timestamp':exam.result_timestamp,
+                    'exam_enable_time': exam.exam_enable_time,
                     'is_enable':exam.is_enable,
+                    'is_available':exam.is_available,
                     'group':{
                         "id":group.id,
                         "group_name":group.group_name,
@@ -83,6 +86,53 @@ def get_exam(request):
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def get_all_exams(request):
+    if request.method == 'POST':
+        exams_arr = []
+        exams_dict = {'data':exams_arr}
+
+        try:
+            exams = Master_Exam.objects.all()
+
+            for exam in exams:
+                group = exam.group
+                template = exam.template
+                admin = group.group_admin
+                exam_dict = {
+                    'id':exam.id,
+                    'name':exam.exam_name,
+                    'duration':exam.exam_duration,
+                    'show_result_immediately':exam.show_result_immediately,
+                    'result_timestamp':exam.result_timestamp,
+                    'exam_enable_time': exam.exam_enable_time,
+                    'is_enable':exam.is_enable,
+                    'is_available':exam.is_available,
+                    'group':{
+                        "id":group.id,
+                        "group_name":group.group_name,
+                        'group_admin_id':admin.id,
+                        'is_available':group.is_available
+                    },
+                    "template":{
+                        'id':template.id,
+                        'name':template.template_name,
+                        'marks': template.template_marks,
+                        'duration': template.template_duration,
+                        'is_available': template.is_available
+                    }
+                }
+                exams_arr.append(exam_dict)
+            return JsonResponse(exams_dict,status = 200)
+        except Master_Exam.DoesNotExist:
+            resp = Response(203,'Exam doesnot exists')
+            return JsonResponse(resp,status = 203)
+
+    else:
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
+
 
 @csrf_exempt
 def update_exam(request):

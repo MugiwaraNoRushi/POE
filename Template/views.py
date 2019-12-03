@@ -75,7 +75,7 @@ def update_template(request):
         data = json.loads(request.body.decode('utf-8'))
         if {'id','name','marks','duration'}.issubset(data.keys()):
             try:
-                template = Master_Template.objects.get(id = data['id'],is_available = True)
+                template = Master_Template.objects.get(id = data['id'])
                 template.template_name = data['name'],
                 template.template_duration = data['duration'],
                 template.template_marks = data['marks']
@@ -146,7 +146,7 @@ def update_Section(request):
         data = json.loads(request.body.decode('utf-8'))
         if {'id','name','marks','duration','template_id','negative_marks'}.issubset(data.keys()):
             try:
-                section = Master_Section.objects.get(id = data['id'],is_available = True)
+                section = Master_Section.objects.get(id = data['id'])
                 section.section_marks = data['marks']
                 section.section_duration = data['duration']
                 section.section_name = data['name']
@@ -211,7 +211,7 @@ def create_template_section(request):
                     section =section,
                     subtopic = subtopic,
                     difficulty_id = data['difficulty_id'],
-                    no_questions = data['no_question'] 
+                    no_questions = data['no_question']
                 )
                 temp_section.save()
             except Master_Section.DoesNotExist:
@@ -241,7 +241,7 @@ def update_template_section(request):
                 temp_section.section =section
                 temp_section.subtopic = subtopic
                 temp_section.difficulty_id = data['difficulty_id']
-                temp_section.no_questions = data['no_question'] 
+                temp_section.no_questions = data['no_question']
                 temp_section.save()
             except Template_Section.DoesNotExist:
                 resp = Response(203,'Template_Section doesnot exist')
@@ -300,7 +300,7 @@ def get_all_template_sections(request):
                         'text':topic.topic_text,
                         'is_available':topic.is_available
                     }
-                }    
+                }
             }
             template_sections_arr.append(temp)
         return JsonResponse(template_sections_dict,status = 200)
@@ -328,7 +328,7 @@ def delete_section_template(request):
     else:
         resp = Response(405,'Wrong Request')
         return JsonResponse(resp, status = 405)
-        
+
 
 @csrf_exempt
 def activate_Template(request):
@@ -351,7 +351,7 @@ def activate_Template(request):
         resp = Response(405,'Wrong Request')
         return JsonResponse(resp, status = 405)
 
-    
+
 @csrf_exempt
 def activate_Section(request):
     if request.method == 'POST':
@@ -431,4 +431,3 @@ def get_Template(request):
     else:
         resp = Response(405,'Wrong Request')
         return JsonResponse(resp, status = 405)
-
