@@ -177,19 +177,20 @@ def check_username(request):
 def change_password(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'username','old_password','new_password'}.issubset(data.keys()):
-                        username = data['username']
+                if {'user_id','old_password','new_password'}.issubset(data.keys()):
+                        user_id = data['user_id']
                         old_password = data['old_password']
                         new_password = data['new_password']
                         try:
-                                user_cred = User_Credentials.objects.get(user_name = username)
+                                user_obj = Master_Users.objects.get(id = user_id)
+                                user_cred = User_Credentials.objects.get(user = user_obj)
                                 if (old_password == user_cred.password):
                                         user_cred.password = new_password
                                         user_cred.save()
                                         resp = Response(200, "password changed successfully")
                                         return JsonResponse(resp,status = 200)
                                 else:
-                                        resp = Response(203,"Old password is incorrect !!")
+                                        resp = Response(203,"Current password is incorrect !!")
                                         return JsonResponse(resp,status = 203)
                         except User_Credentials.DoesNotExist:
                                 resp = Response(203, "Wrong user name ")
@@ -296,12 +297,17 @@ def activate_user(request):
                 if {'user_id'}.issubset(data.keys()):
                         try:
                                 user_obj = Master_Users.objects.get(id = data['user_id'])
+                                user_cred_obj = User_Credentials.objects.get(user = user_obj)
                         except:
                                 resp = Response(203,'User does not exists')
                                 return JsonResponse(resp,status = 203)
 
                         user_obj.is_available = True
                         user_obj.save()
+
+                        user_cred_obj.is_active = True
+                        user_cred_obj.save()
+
                         resp = Response(200,'User activated successfully ')
                         return JsonResponse(resp,status = 200)
                 else:

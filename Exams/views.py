@@ -50,33 +50,7 @@ def get_exam(request):
         if {'id'}.issubset(data.keys()):
             try:
                 exam = Master_Exam.objects.get(id = data['id'])
-                group = exam.group
-                template = exam.template
-                admin = group.group_admin
-                exam_dict = {
-                    'id':exam.id,
-                    'name':exam.exam_name,
-                    'duration':exam.exam_duration,
-                    'show_result_immediately':exam.show_result_immediately,
-                    'result_timestamp':exam.result_timestamp,
-                    'exam_enable_time': exam.exam_enable_time,
-                    'is_enable':exam.is_enable,
-                    'is_available':exam.is_available,
-                    'group':{
-                        "id":group.id,
-                        "group_name":group.group_name,
-                        'group_admin_id':admin.id,
-                        'is_available':group.is_available
-                    },
-                    "template":{
-                        'id':template.id,
-                        'name':template.template_name,
-                        'marks': template.template_marks,
-                        'duration': template.template_duration,
-                        'is_available': template.is_available
-                    }
-                }
-                return JsonResponse(exam_dict,status = 200)
+                return JsonResponse(get_exam_dict(exam),status = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
                 return JsonResponse(resp,status = 203)
@@ -92,43 +66,14 @@ def get_all_exams(request):
     if request.method == 'POST':
         exams_arr = []
         exams_dict = {'data':exams_arr}
-
         try:
             exams = Master_Exam.objects.all()
-
             for exam in exams:
-                group = exam.group
-                template = exam.template
-                admin = group.group_admin
-                exam_dict = {
-                    'id':exam.id,
-                    'name':exam.exam_name,
-                    'duration':exam.exam_duration,
-                    'show_result_immediately':exam.show_result_immediately,
-                    'result_timestamp':exam.result_timestamp,
-                    'exam_enable_time': exam.exam_enable_time,
-                    'is_enable':exam.is_enable,
-                    'is_available':exam.is_available,
-                    'group':{
-                        "id":group.id,
-                        "group_name":group.group_name,
-                        'group_admin_id':admin.id,
-                        'is_available':group.is_available
-                    },
-                    "template":{
-                        'id':template.id,
-                        'name':template.template_name,
-                        'marks': template.template_marks,
-                        'duration': template.template_duration,
-                        'is_available': template.is_available
-                    }
-                }
-                exams_arr.append(exam_dict)
+                exams_arr.append(get_exam_dict(exam))
             return JsonResponse(exams_dict,status = 200)
         except Master_Exam.DoesNotExist:
             resp = Response(203,'Exam doesnot exists')
             return JsonResponse(resp,status = 203)
-
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
@@ -221,7 +166,9 @@ def create_user_test(request):
     else:
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
-#do u need to update the user ??
+
+
+
 @csrf_exempt
 def update_user_test(request):
     if request.method == 'POST':
@@ -271,6 +218,70 @@ def delete_user_test(request):
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
-#do I have to create an activate method for exams, it does not make sense!!!!
-#what to do with remaining tables
-#dynamic things remain
+
+
+@csrf_exempt
+def get_all_exams_user(request):
+    if request.method == 'POST':
+        data =json.loads(request.body.decode('utf-8'))
+        if {'user_id'}.issubset(data.keys()):
+            try:
+                user = Master_Users.objects.get(id = data['user_id'])
+                group_mappings = User_Group_Mapping.objects.filter(user = user)
+            except Master_Users.DoesNotExist:
+                resp = Response(204,'User doesnot exist ')
+                return JsonResponse(resp,status = 204)
+            except User_Group_Mapping.DoesNotExist:
+                resp = Response(204,'user and group do not match')
+                return JsonResponse(resp,status = 204)
+            exams_arr = []
+            exams_dict = {'data':exams_arr}
+            for group_mapping in group_mappings:
+                try:
+                    group = group_mapping.group
+                    exams = Master_Exam.objects.filter(group = group)
+                except Master_Exam.DoesNotExist:
+                    pass
+                for exam in exams:
+                    exams_arr.append(get_exam_dict(exam))
+            return JsonResponse(exams_dict,status = 200)
+        else:
+            resp = Response(204,'Wrong key value pair')
+            return JsonResponse(resp,status = 204)
+    else:
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
+
+
+#--------------------------------UTILS -----------------------------------------------------
+
+def get_exam_dict(exam):
+
+    group = exam.group
+    template = exam.template
+    admin = group.group_admin
+
+    exam_dict = {
+        'id':exam.id,
+        'name':exam.exam_name,
+        'duration':exam.exam_duration,
+        'show_result_immediately':exam.show_result_immediately,
+        'result_timestamp':exam.result_timestamp,
+        'exam_enable_time': exam.exam_enable_time,
+        'is_enable':exam.is_enable,
+        'is_available':exam.is_available,
+        'group':{
+            "id":group.id,
+            "group_name":group.group_name,
+            'group_admin_id':admin.id,
+            'is_available':group.is_available
+        },
+        "template":{
+            'id':template.id,
+            'name':template.template_name,
+            'marks': template.template_marks,
+            'duration': template.template_duration,
+            'is_available': template.is_available
+        }
+    }
+    return exam_dict

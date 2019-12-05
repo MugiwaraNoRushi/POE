@@ -147,6 +147,18 @@ def scroll_through_exam(request):
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
+
+
+
+@csrf_exempt
+def get_result(request):
+    pass
+
+
+
+
+
+    
 #-------------------UTILS METHODS ---------------------------------------------------
 
 
