@@ -12,6 +12,7 @@ urlpatterns = [
     path('create/user/test/status/',create_user_test,name = 'create a user test status'),
     path('update/user/test/status/',update_user_test,name = 'update a user test status'),
     path('delete/user/test/status/',delete_user_test,name = 'delete a user test status'),
+    path('get/user/test/status/all/'),
     path('start/exam/',assign_questions_to_exam,name = 'start exam ; doesnot matter for first time or aftermore'),
     path('scroll/through/exam/',scroll_through_exam,name = 'for pressing next button')
 ]

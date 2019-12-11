@@ -103,6 +103,7 @@ def assign_questions_to_exam(request):
 
 
 
+
 #new method
 @csrf_exempt
 def scroll_through_exam(request):

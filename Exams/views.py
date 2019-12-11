@@ -243,7 +243,13 @@ def get_all_exams_user(request):
                 except Master_Exam.DoesNotExist:
                     pass
                 for exam in exams:
-                    exams_arr.append(get_exam_dict(exam))
+                    exam_dict = get_exam_dict(exam)
+                    try:
+                        user_test = User_Test_Status.objects.get(exam = exam,user = user)
+                        temp_dict['status'] = user_test.status
+                    except User_Test_Status.DoesNotExist:
+                        temp_dict['status'] = 1
+                    exams_arr.append(temp_dict)
             return JsonResponse(exams_dict,status = 200)
         else:
             resp = Response(204,'Wrong key value pair')
