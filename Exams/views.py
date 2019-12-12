@@ -243,7 +243,7 @@ def get_all_exams_user(request):
                 except Master_Exam.DoesNotExist:
                     pass
                 for exam in exams:
-                    exam_dict = get_exam_dict(exam)
+                    temp_dict = get_exam_dict(exam)
                     try:
                         user_test = User_Test_Status.objects.get(exam = exam,user = user)
                         temp_dict['status'] = user_test.status

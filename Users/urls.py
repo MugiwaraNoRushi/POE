@@ -1,6 +1,6 @@
 from django.urls import path
 from Users.views import *
-
+from Users.auth import *
 
 
 urlpatterns = [
@@ -29,4 +29,6 @@ urlpatterns = [
     path('get/all/users/',get_all_users,name = 'get all users'),
     path('delete/user/',delete_user,name = 'delete a user'),
     path('activate/user/',activate_user,name = 'activate a user'),
+    #try auth
+    path('auth/',create_key,name = 'auth a key')
 ]
