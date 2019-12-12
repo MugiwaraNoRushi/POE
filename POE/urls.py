@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from POE.authentication import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -22,5 +23,7 @@ urlpatterns = [
     path('services/questions/',include('Questions.urls')),
     path('services/topics/',include('Topics.urls')),
     path('services/template/',include('Template.urls')),
-    path('services/exams/',include('Exams.urls'))
+    path('services/exams/',include('Exams.urls')),
+    path('auth/isj980jokj83563bojbdjh57769ghj09jjsdh8/',create_key,name = 'create key'),
+
 ]

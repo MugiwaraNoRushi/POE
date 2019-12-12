@@ -1,5 +1,4 @@
 import json
-import pyDes
 import random
 from base64 import b64decode
 from django.views.decorators.csrf import csrf_exempt
@@ -8,6 +7,7 @@ from django.http import HttpResponse,JsonResponse
 from django.shortcuts import render
 from Users.models import User_Credentials,Master_Users,Master_City,Temp_Master_Users, Master_Groups,User_Group_Mapping
 from Users.utils import Response
+from POE.authentication import authenticate
 
 #-------------------------------------------------------------------------------------------------
 
@@ -16,11 +16,11 @@ def validate(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
                 keys = set(data.keys())
-                if {'username','password'}.issubset(keys):
+                if {'username','password'}.issubset(keys) and authenticate(data['auth_key']):
                         username = data['username']
                         password = data['password']
                 else:
-                        resp = Response(204,"Wrong key value")
+                        resp = Response(401,"Bad Request")
                         return JsonResponse(resp,status = 204)
                 try:
                         user_obj = User_Credentials.objects.get(user_name =  username,password = password,is_active = True)
@@ -32,7 +32,7 @@ def validate(request):
                         resp = Response(477, Exception)
                         return JsonResponse(resp,status = 477)
         else:
-                resp = Response(205,'Bad Request!!')
+                resp = Response(405,'Bad Request!!')
                 return JsonResponse(resp,status = 405)
 
 #-----------------------------------------------------------------------------------------
