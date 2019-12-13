@@ -44,12 +44,17 @@ def match_token(token):
     minute = time[2].split(':')
  
     if (token[4:6] == month):
+        print('month')
         if token[6:8] == date:
+            print('date')
             if ((hour * 60) + minute) - (int(token[8:10])*60 + int(token[10:12])) <= 1:
+                print('time')
                 hour = int(token[8:10])
                 minute = int(token[10:12])
                 if int(token[0:4]) == month*minute:
+                    print('first value')
                     if int(token[12:16]) == date*hour:
+                        print('second value')
                         return True
                         print('true')
     print('false')
