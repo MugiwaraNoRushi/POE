@@ -24,6 +24,6 @@ urlpatterns = [
     path('services/topics/',include('Topics.urls')),
     path('services/template/',include('Template.urls')),
     path('services/exams/',include('Exams.urls')),
-    path('auth/isj980jokj83563bojbdjh57769ghj09jjsdh8/',create_key,name = 'create key'),
+    path('services/auth/isj980jokj83563bojbdjh57769ghj09jjsdh8/',create_key,name = 'create key'),
 
 ]
