@@ -41,9 +41,8 @@ def validate(request):
 def signup(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
-                print(data)
                 keys = set(data.keys())
-                if {'f_name','m_name','l_name','address1','address2','email','phone','city_id','username','password','user_type'}.issubset(keys):
+                if {'f_name','m_name','l_name','address1','address2','email','phone','city_id','username','password','user_type'}.issubset(keys) and authenticate(data['auth_key']):
                         email = data['email']
                         #if email already exists !!
                         try:
@@ -92,13 +91,8 @@ def signup(request):
                         }
                         return JsonResponse(val_dict,status = 200)
 
-                else:
-                       resp = Response(204,"Wrong key value")
-                       return JsonResponse(resp,status = 204)
-
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 #-----------------------------------------------------------------------------------------
 
@@ -106,51 +100,47 @@ def signup(request):
 def validate_registration(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                #email and registration number how to fetch them !!!!
-                email = data['email']
-                registration_number = data['reg_num']
-                #decryption remains !!
-                #problem of how to fetch reg_number and email
-                try:
-                        user_obj = Temp_Master_Users.objects.get(email = email,registration_code = registration_number)
-                        now = datetime.now(timezone.utc)
-                        reg_time = user_obj.entry_time
-                        #find a proper difference !!
-                        difference = timedelta(days = 0,hours = 1,minutes = 0 )
-                        if (now - reg_time < difference):
-                                master_user_obj = Master_Users.objects.create(
-                                        first_name = user_obj.first_name,
-                                        last_name = user_obj.last_name,
-                                        middle_name = user_obj.middle_name,
-                                        address1 = user_obj.address1,
-                                        address2 = user_obj.address2,
-                                        phone = user_obj.phone,
-                                        email = user_obj.email,
-                                        user_type_id = user_obj.user_type_id,
-                                        city = user_obj.city,
-                                        is_available = True
-                                )
-                                master_user_obj.save()
-                                user_cred = User_Credentials.objects.create(
-                                        user_name = user_obj.username,
-                                        password = user_obj.password,
-                                        user = master_user_obj
-                                )
-                                user_cred.save()
-                                user_obj.delete()
-                                resp = Response(200,"Your account has been created successfully !")
-                                return JsonResponse(resp,status = 200)
-                        else:
-                                resp = Response(203, "The token has expired, Please try signing up again")
-                                return JsonResponse(resp,status = 203)
+                if {'email','reg_num'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                        email = data['email']
+                        registration_number = data['reg_num']
+                        try:
+                                user_obj = Temp_Master_Users.objects.get(email = email,registration_code = registration_number)
+                                now = datetime.now(timezone.utc)
+                                reg_time = user_obj.entry_time
+                                difference = timedelta(days = 0,hours = 1,minutes = 0 )
+                                if (now - reg_time < difference):
+                                        master_user_obj = Master_Users.objects.create(
+                                                first_name = user_obj.first_name,
+                                                last_name = user_obj.last_name,
+                                                middle_name = user_obj.middle_name,
+                                                address1 = user_obj.address1,
+                                                address2 = user_obj.address2,
+                                                phone = user_obj.phone,
+                                                email = user_obj.email,
+                                                user_type_id = user_obj.user_type_id,
+                                                city = user_obj.city,
+                                                is_available = True
+                                        )
+                                        master_user_obj.save()
+                                        user_cred = User_Credentials.objects.create(
+                                                user_name = user_obj.username,
+                                                password = user_obj.password,
+                                                user = master_user_obj
+                                        )
+                                        user_cred.save()
+                                        user_obj.delete()
+                                        resp = Response(200,"Your account has been created successfully !")
+                                        return JsonResponse(resp,status = 200)
+                                else:
+                                        resp = Response(203, "The token has expired, Please try signing up again")
+                                        return JsonResponse(resp,status = 203)
 
-                except Temp_Master_Users.DoesNotExist:
-                        #change the message to a proper message
-                        resp = Response(203,"Wrong Registration Number !!")
-                        return JsonResponse(resp,status = 203)
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+                        except Temp_Master_Users.DoesNotExist:
+                                #change the message to a proper message
+                                resp = Response(203,"Wrong Registration Number !!")
+                                return JsonResponse(resp,status = 203)
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 #-----------------------------------------------------------------------------------------
 
@@ -177,7 +167,7 @@ def check_username(request):
 def change_password(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'user_id','old_password','new_password'}.issubset(data.keys()):
+                if {'user_id','old_password','new_password'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         user_id = data['user_id']
                         old_password = data['old_password']
                         new_password = data['new_password']
@@ -195,12 +185,9 @@ def change_password(request):
                         except User_Credentials.DoesNotExist:
                                 resp = Response(203, "Wrong user name ")
                                 return JsonResponse(resp,status = 203)
-                else:
-                        resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+        
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 
 #----------------------------------------------------------------------------------------
@@ -209,7 +196,7 @@ def change_password(request):
 def get_user_by_id(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'user_id'}.issubset(data.keys()):
+                if {'user_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         try:
                                 user_obj = User_Credentials.objects.get(id = data['user_id'])
                                 user = user_obj.user
@@ -219,18 +206,15 @@ def get_user_by_id(request):
                                 resp = Response(203, "user doesnot exists")
                                 return JsonResponse(resp,status = 203)
 
-                else:
-                        resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def get_user(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'username'}.issubset(data.keys()):
+                if {'username'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         try:
                                 user_obj = User_Credentials.objects.get(user_name =  data['username'])
                                 user = user_obj.user
@@ -240,34 +224,33 @@ def get_user(request):
                                 resp = Response(203, "username doesnot exists")
                                 return JsonResponse(resp,status = 203)
 
-                else:
-                        resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+               
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
 def get_all_users(request):
         if request.method == 'POST':
-                users = Master_Users.objects.all()
-                arr_dict = []
-                data_dict = {
-                        'data':arr_dict
-                }
-                for user in users:
-                        arr_dict.append(get_user_dict(user))
-                return JsonResponse(data_dict,status = 200)
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+                data =json.loads(request.body.decode('utf-8'))
+                if authenticate(data['auth_key']):
+                        users = Master_Users.objects.all()
+                        arr_dict = []
+                        data_dict = {
+                                'data':arr_dict
+                        }
+                        for user in users:
+                                arr_dict.append(get_user_dict(user))
+                        return JsonResponse(data_dict,status = 200)
+
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def delete_user(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'user_id'}.issubset(data.keys()):
+                if {'user_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         try:
                                 user_obj = Master_Users.objects.get(id = data['user_id'])
                                 user_cred_obj = User_Credentials.objects.get(user = user_obj)
@@ -283,18 +266,16 @@ def delete_user(request):
 
                         resp = Response(200,'User deleted successfully ')
                         return JsonResponse(resp,status = 200)
-                else:
-                        resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+             
+      
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def activate_user(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'user_id'}.issubset(data.keys()):
+                if {'user_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         try:
                                 user_obj = Master_Users.objects.get(id = data['user_id'])
                                 user_cred_obj = User_Credentials.objects.get(user = user_obj)
@@ -310,12 +291,9 @@ def activate_user(request):
 
                         resp = Response(200,'User activated successfully ')
                         return JsonResponse(resp,status = 200)
-                else:
-                        resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 #----------------------------------------------------------------------------------------
 
@@ -335,13 +313,9 @@ def create_group(request):
                         }
                         resp = Response(200,'Created Successfully')
                         return JsonResponse(resp,status = 200)
-                else:
-                        resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)
-
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+        
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 
 #-------------------------------------------------------------------------------------------------
@@ -351,19 +325,19 @@ def create_group(request):
 def get_group(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
-                if {'group_id'}.issubset(data.keys()):
+                if {'group_id'}.issubset(data.keys()) and authenticate(data['auth_key']): 
                         try:
                                 group = Master_Groups.objects.get(id = data['group_id'])
                                 return JsonResponse(get_group_dict(group), status = 200)
                         except:
                                 resp = Response(203,'Group doesnot exists')
                                 return JsonResponse(resp,status = 203)
-                else:
-                        resp = Response(204,"Wrong key value")
-                        return JsonResponse(resp,status = 204)
-        else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+               
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
+
+#Changes remain from here
+
 
 @csrf_exempt
 def get_all_groups(request):

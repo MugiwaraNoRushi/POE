@@ -15,24 +15,13 @@ def create_key(request):
         token = data['token']
         if match_token(token):
             global AUTH_KEY
-            AUTH_KEY = random.randint(1000000000,9999999999)
+            AUTH_KEY = random.randint(100000000000,999999999999)
             dict = {
                 'auth_key':AUTH_KEY
             }
             return JsonResponse(dict,status = 200)
     resp = Response(400,'Bad Request')
     return JsonResponse(resp)
-
-@csrf_exempt
-def send_key(request):
-    if (AUTH_KEY == None):
-        resp = Response(400,'no key found')
-        return JsonResponse(resp)
-    else:
-        dict = {
-            'auth_key':AUTH_KEY
-        }
-        return JsonResponse(dict,status = 200)
 
 
 #-------------------UTILS-------------------------------------------------------------------
@@ -56,9 +45,12 @@ def match_token(token):
  
     if (token[4:6] == month):
         if token[6:8] == date:
-            return True
-            # if int(token[0:4]) == month*minute:
-            #     if int(token[12:16]) == date*hour:
-            #         return True
-    
+            if ((hour * 60) + minute) - (int(token[8:10])*60 + int(token[10:12])) <= 1:
+                hour = int(token[8:10])
+                minute = int(token[10:12])
+                if int(token[0:4]) == month*minute:
+                    if int(token[12:16]) == date*hour:
+                        return True
+                        print('true')
+    print('false')
     return False
