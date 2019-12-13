@@ -16,7 +16,7 @@ def create_key(request):
         token = data['token']
         if match_token(token):
             global AUTH_KEY
-            AUTH_KEY = random.randint(100000000000,999999999999)
+            AUTH_KEY = str(random.randint(100000000000,999999999999))
             dict = {
                 'auth_key':AUTH_KEY
             }

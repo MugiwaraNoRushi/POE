@@ -16,7 +16,7 @@ def validate(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
                 keys = set(data.keys())
-                if {'username','password'}.issubset(keys) and authenticate(data['auth_key']):
+                if {'username','password','auth_key'}.issubset(keys) and authenticate(data['auth_key']):
                         username = data['username']
                         password = data['password']
                 else:
@@ -42,7 +42,7 @@ def signup(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
                 keys = set(data.keys())
-                if {'f_name','m_name','l_name','address1','address2','email','phone','city_id','username','password','user_type'}.issubset(keys) and authenticate(data['auth_key']):
+                if {'auth_key','f_name','m_name','l_name','address1','address2','email','phone','city_id','username','password','user_type'}.issubset(keys) and authenticate(data['auth_key']):
                         email = data['email']
                         #if email already exists !!
                         try:
@@ -100,7 +100,7 @@ def signup(request):
 def validate_registration(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'email','reg_num'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                if {'auth_key','email','reg_num'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         email = data['email']
                         registration_number = data['reg_num']
                         try:
@@ -167,7 +167,7 @@ def check_username(request):
 def change_password(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'user_id','old_password','new_password'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                if {'auth_key','user_id','old_password','new_password'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         user_id = data['user_id']
                         old_password = data['old_password']
                         new_password = data['new_password']
@@ -196,7 +196,7 @@ def change_password(request):
 def get_user_by_id(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'user_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                if {'auth_key','user_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         try:
                                 user_obj = User_Credentials.objects.get(id = data['user_id'])
                                 user = user_obj.user
@@ -214,7 +214,7 @@ def get_user_by_id(request):
 def get_user(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'username'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                if {'auth_key','username'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         try:
                                 user_obj = User_Credentials.objects.get(user_name =  data['username'])
                                 user = user_obj.user
@@ -233,7 +233,7 @@ def get_user(request):
 def get_all_users(request):
         if request.method == 'POST':
                 data =json.loads(request.body.decode('utf-8'))
-                if authenticate(data['auth_key']):
+                if {'auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         users = Master_Users.objects.all()
                         arr_dict = []
                         data_dict = {
@@ -250,7 +250,7 @@ def get_all_users(request):
 def delete_user(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'user_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                if {'user_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         try:
                                 user_obj = Master_Users.objects.get(id = data['user_id'])
                                 user_cred_obj = User_Credentials.objects.get(user = user_obj)
@@ -275,7 +275,7 @@ def delete_user(request):
 def activate_user(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'user_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                if {'user_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         try:
                                 user_obj = Master_Users.objects.get(id = data['user_id'])
                                 user_cred_obj = User_Credentials.objects.get(user = user_obj)
@@ -303,7 +303,7 @@ def activate_user(request):
 def create_group(request):
         if request.method == "POST":
                 data = json.loads(request.body.decode('utf-8'))
-                if {'group_name','user_id'}.issubset(data.keys()):
+                if {'auth_key','group_name','user_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         user_obj = Master_Users.objects.get(id = data['user_id'])
                         group_obj = Master_Groups.objects.create(group_name = data['group_name'],group_admin = user_obj)
                         group_obj.save()
@@ -325,7 +325,7 @@ def create_group(request):
 def get_group(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
-                if {'group_id'}.issubset(data.keys()) and authenticate(data['auth_key']): 
+                if {'auth_key','group_id'}.issubset(data.keys()) and authenticate(data['auth_key']): 
                         try:
                                 group = Master_Groups.objects.get(id = data['group_id'])
                                 return JsonResponse(get_group_dict(group), status = 200)
