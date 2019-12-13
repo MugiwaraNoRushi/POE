@@ -38,22 +38,30 @@ def authenticate(key):
 
 def match_token(token):
     time = str(datetime.now()).split('-')
-    month = time[1]
-    date = time[2].split(':')[0][:2]
-    hour = time[2].split(':')[0][3:5]
-    minute = time[2].split(':')
+    month = int(str(time[1]))
+    date = int(str(time[2].split(':')[0][:2]))
+    hour = int(str(time[2].split(':')[0][3:5]))
+    minute = int(str(time[2].split(':')[1]))
  
-    if (token[4:6] == month):
-        print('month')
-        if token[6:8] == date:
-            print('date')
-            if ((hour * 60) + minute) - (int(token[8:10])*60 + int(token[10:12])) <= 1:
+    if (token[4:6] == date):
+        print('date')
+        if token[6:8] == month:
+            print('month')
+            first_val = int(str(token[0:4]))
+            print(first_val)
+            hour_t = int(str(token[8:10]))
+            print(hour_t)
+            minute_t = int(str(token[10:12]))
+            print(minute_t)
+            last_val = int(str(token[12:16]))
+            print(last_val)
+            if ((hour*60 + minute) - (hour_t*60 + minute_t)) <= 1:
                 print('time')
-                hour = int(token[8:10])
-                minute = int(token[10:12])
-                if int(token[0:4]) == month*minute:
+                hour = hour_t
+                minute = minute_t
+                if first_val == month*minute:
                     print('first value')
-                    if int(token[12:16]) == date*hour:
+                    if last_val == date*hour:
                         print('second value')
                         return True
                         print('true')
