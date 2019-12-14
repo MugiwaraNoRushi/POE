@@ -7,12 +7,13 @@ from django.http import JsonResponse
 from Users.utils import Response
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from POE.authentication import authenticate
 
 @csrf_exempt
 def create_exam(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'exam_name','exam_duration','group_id','template_id','show_result','result_timestamp','is_enable','exam_enable_time'}.issubset(data.keys()):
+        if {'exam_name','exam_duration','group_id','template_id','show_result','result_timestamp','is_enable','exam_enable_time','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 group = Master_Groups.objects.get(id = data['group_id'],is_available = True)
                 template = Master_Template.objects.get(id = data['template_id'],is_available = True)
@@ -35,55 +36,51 @@ def create_exam(request):
             except Master_Groups.DoesNotExist:
                 resp = Response(203,'Group doesnot exists')
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+        
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 #decide the parameters to return
 @csrf_exempt
 def get_exam(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'id'}.issubset(data.keys()):
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 exam = Master_Exam.objects.get(id = data['id'])
                 return JsonResponse(get_exam_dict(exam),status = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+        
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def get_all_exams(request):
     if request.method == 'POST':
-        exams_arr = []
-        exams_dict = {'data':exams_arr}
-        try:
-            exams = Master_Exam.objects.all()
-            for exam in exams:
-                exams_arr.append(get_exam_dict(exam))
-            return JsonResponse(exams_dict,status = 200)
-        except Master_Exam.DoesNotExist:
-            resp = Response(203,'Exam doesnot exists')
-            return JsonResponse(resp,status = 203)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+        data = json.loads(request.body.decode('utf-8'))
+        if {'auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            exams_arr = []
+            exams_dict = {'data':exams_arr}
+            try:
+                exams = Master_Exam.objects.all()
+                for exam in exams:
+                    exams_arr.append(get_exam_dict(exam))
+                return JsonResponse(exams_dict,status = 200)
+            except Master_Exam.DoesNotExist:
+                resp = Response(203,'Exam doesnot exists')
+                return JsonResponse(resp,status = 203)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
 def update_exam(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'id','exam_name','exam_duration','group_id','template_id','show_result','result_timestamp','is_enable','exam_enable_time'}.issubset(data.keys()):
+        if {'id','exam_name','exam_duration','group_id','template_id','show_result','result_timestamp','is_enable','exam_enable_time','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 group = Master_Groups.objects.get(id = data['group_id'],is_available = True)
                 template = Master_Template.objects.get(id = data['template_id'],is_available = True)
@@ -108,18 +105,15 @@ def update_exam(request):
             except Master_Groups.DoesNotExist:
                 resp = Response(203,'Group doesnot exists')
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+       
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def delete_exam(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'id'}.issubset(data.keys()):
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 exam = Master_Exam.objects.get(id = data['id'],is_available = True)
                 exam.is_available = False
@@ -129,19 +123,16 @@ def delete_exam(request):
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+       
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
 def create_user_test(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'exam_id','user_id','status','duration'}.issubset(data.keys()):
+        if {'exam_id','user_id','status','duration','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 exam = Master_Exam.objects.get(id = data['exam_id'])
                 user = Master_Users.objects.get(id = data['user_id'])
@@ -160,12 +151,9 @@ def create_user_test(request):
             except Master_Users.DoesNotExist:
                 resp = Response(203,'User doesnot exists')
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 
@@ -173,7 +161,7 @@ def create_user_test(request):
 def update_user_test(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'id','status','duration'}.issubset(data.keys()):
+        if {'id','status','duration','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 user_test_status = User_Test_Status.objects.get(id = data['id'])
                 user_test_status.status = data['status']
@@ -191,18 +179,15 @@ def update_user_test(request):
             except Master_Users.DoesNotExist:
                 resp = Response(203,'User doesnot exists')
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+        
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def delete_user_test(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'id'}.issubset(data.keys()):
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 user_test_status = User_Test_Status.objects.get(id = data['id'])
                 user_test_status.delete()
@@ -211,12 +196,9 @@ def delete_user_test(request):
             except User_Test_Status.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+       
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 
@@ -224,7 +206,7 @@ def delete_user_test(request):
 def get_all_exams_user(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'user_id'}.issubset(data.keys()):
+        if {'user_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 user = Master_Users.objects.get(id = data['user_id'])
                 group_mappings = User_Group_Mapping.objects.filter(user = user)
@@ -251,12 +233,9 @@ def get_all_exams_user(request):
                         temp_dict['status'] = 1
                     exams_arr.append(temp_dict)
             return JsonResponse(exams_dict,status = 200)
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+        
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 #--------------------------------UTILS -----------------------------------------------------

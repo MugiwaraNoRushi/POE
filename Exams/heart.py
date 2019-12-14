@@ -16,7 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 def assign_questions_to_exam(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'user_id','exam_id'}.issubset(data.keys()):
+        if {'user_id','exam_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             template_section_arr_obj = []
             #get a template by using exam_id
             try:
@@ -94,12 +94,9 @@ def assign_questions_to_exam(request):
             user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
             question = user_question_assigned_arr[0].question
             return JsonResponse(soul(question,user_question_assigned_arr),status = 200)
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+        
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 
@@ -109,7 +106,7 @@ def assign_questions_to_exam(request):
 def scroll_through_exam(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'question_assigned_id','option_id','marked','next_question_id','user_id','exam_id'}.issubset(data.keys()):
+        if {'question_assigned_id','option_id','marked','next_question_id','user_id','exam_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 #response saved
                 user_response = User_Question_Response.objects.get(section_question = data['question_assigned_id'])
@@ -141,12 +138,9 @@ def scroll_through_exam(request):
             user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
             return JsonResponse(soul(question,user_question_assigned_arr),status = 200)
 
-        else:
-            resp = Response(204,'Wrong key value pair')
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+       
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 

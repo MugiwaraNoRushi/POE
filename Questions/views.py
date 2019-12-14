@@ -5,14 +5,13 @@ from Users.utils import Response
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from Topics.models import Master_SubTopic
+from POE.authentication import *
 
 @csrf_exempt
 def add_question(request):
-    #choose subtopic and how to send correct option and options  
-    #How to create subtopic 
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
-        if {'question_type',"question_marks","question_text","difficulty","subtopic","options","correct_options"}.issubset(data.keys()):
+        if {'auth_key','question_type',"question_marks","question_text","difficulty","subtopic","options","correct_options"}.issubset(data.keys()) and authenticate(data['auth_key']):
             subtopic_obj = Master_SubTopic.objects.get(id = data['subtopic'])
             question_obj = Master_Question.objects.create(
             question_type = data['question_type'],
@@ -35,18 +34,15 @@ def add_question(request):
             resp = Response(200, "Question added successfully")
             return JsonResponse(resp,status = 200)  
             
-        else:
-            resp = Response(204, "Wrong key value pair")
-            return JsonResponse(resp,status = 204)
-    else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+       
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def delete_question(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
-        if ({'question_id'}.issubset(data.keys())):
+        if ({'question_id','auth_key'}.issubset(data.keys())) and authenticate(data['auth_key']):
             try:
                 question_obj = Master_Question.objects.get(id = data['question_id'],is_available = True)
                 question_obj.is_available = False
@@ -64,18 +60,15 @@ def delete_question(request):
             except:
                 resp = Response(203,'Question or Options doesnot exists')
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value pair")
-            return JsonResponse(resp,status = 204)
-    else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+        
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
     
 @csrf_exempt
 def update_question(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
-        if {'question_id','question_type',"question_marks","question_text","difficulty","subtopic","options","correct_options"}.issubset(data.keys()):
+        if {'auth_key','question_id','question_type',"question_marks","question_text","difficulty","subtopic","options","correct_options"}.issubset(data.keys()) and authenticate(data['auth_key']):
             subtopic_obj = Master_SubTopic.objects.get(id = data['subtopic'])
             question_obj = Master_Question.objects.get(id = data['question_id'])
             question_obj.question_type = data['question_type']
@@ -106,20 +99,17 @@ def update_question(request):
                         correct_option.save()    
             resp = Response(200, "Question modified successfully")
             return JsonResponse(resp,status = 200)  
-        else:
-            resp = Response(204, "Wrong key value pair")
-            return JsonResponse(resp,status = 204)
-    else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+        
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
-#WHAT to do in this get all and do we have to create an activate method for this.
+
 @csrf_exempt
 def get_all_questions(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
-        if {'subtopic_id'}.issubset(data.keys()):
+        if {'subtopic_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             subtopic = Master_SubTopic.objects.get(id = data['subtopic_id'])
             questions = Master_Question.objects.filter(subtopic = subtopic,is_available = True)
             arr_dict = []
@@ -131,13 +121,9 @@ def get_all_questions(request):
             except:
                 resp = Response('Something went wrong GEN 1',Exception)
                 return JsonResponse(resp, status = 477)
-        else:
-            resp = Response(204, "Wrong key value pair")
-            return JsonResponse(resp,status = 204)        
-
-    else:
-                resp = Response(405,'Bad Request!!')
-                return JsonResponse(resp,status = 405)
+        
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 #-----------------UTILS----------------------------------------------------------------------------

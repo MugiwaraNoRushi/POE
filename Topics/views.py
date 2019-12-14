@@ -4,13 +4,14 @@ from django.http import JsonResponse
 from Users.utils import Response
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from POE.authentication import authenticate
 
 #decide about what to do with creation of multiple same topics
 @csrf_exempt
 def create_topic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'text'}.issubset(data.keys()):
+        if {'text','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 topic = Master_Topic.objects.get(topic_text = data['text'])
                 resp = Response(203,"Topic already exists")
@@ -20,19 +21,16 @@ def create_topic(request):
                 topic.save()
                 resp = Response(200,"Created successfully")
                 return JsonResponse(resp,status = 200)
-        else:
-            resp = Response(204, "Wrong key value ")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
 def create_subtopic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'text','topic_id'}.issubset(data.keys()):
+        if {'text','topic_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 topic = Master_Topic.objects.get(id = data['topic_id'])
                 subtopic = Master_SubTopic.objects.get(subtopic_text = data['text'],topic = data['topic_id'])
@@ -43,54 +41,55 @@ def create_subtopic(request):
                 subtopic.save()
                 resp = Response(200,"Created successfully")
                 return JsonResponse(resp,status = 200)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def get_all_topics(request):
     if request.method == 'POST':
-        topics_arr = []
-        topics_dict = {'data':topics_arr}
-        topics = Master_Topic.objects.all()
-        for topic in topics:
-            temp = {
-                'id':topic.id,
-                'text':topic.topic_text,
-                'is_available':topic.is_available
-            }
-            topics_arr.append(temp)
-        return JsonResponse(topics_dict,status = 200)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
-
-@csrf_exempt
-def get_all_subtopics(request):
-    if request.method == 'POST':
-        subtopics_arr = []
-        subtopics_dict = {'data':subtopics_arr}
-        subtopics = Master_SubTopic.objects.all()
-        for subtopic in subtopics:
-            topic = subtopic.topic
-            temp = {
-                'id':subtopic.id,
-                'text':subtopic.subtopic_text,
-                'is_available':subtopic.is_available,
-                'topic':{
+        data = json.loads(request.body.decode('utf-8'))
+        if {'auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            topics_arr = []
+            topics_dict = {'data':topics_arr}
+            topics = Master_Topic.objects.all()
+            for topic in topics:
+                temp = {
                     'id':topic.id,
                     'text':topic.topic_text,
                     'is_available':topic.is_available
                 }
-            }
-            subtopics_arr.append(temp)
-        return JsonResponse(subtopics_dict,status = 200)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+                topics_arr.append(temp)
+            return JsonResponse(topics_dict,status = 200)
+
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def get_all_subtopics(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            subtopics_arr = []
+            subtopics_dict = {'data':subtopics_arr}
+            subtopics = Master_SubTopic.objects.all()
+            for subtopic in subtopics:
+                topic = subtopic.topic
+                temp = {
+                    'id':subtopic.id,
+                    'text':subtopic.subtopic_text,
+                    'is_available':subtopic.is_available,
+                    'topic':{
+                        'id':topic.id,
+                        'text':topic.topic_text,
+                        'is_available':topic.is_available
+                    }
+                }
+                subtopics_arr.append(temp)
+            return JsonResponse(subtopics_dict,status = 200)
+
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 #-------------------------------------------------------------------------------------------
 
@@ -99,7 +98,7 @@ def get_all_subtopics(request):
 def delete_subtopic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'id'}.issubset(data.keys()):
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 subtopic = Master_SubTopic.objects.get(id = data['id'],is_available = True)
                 subtopic.is_available = False
@@ -109,19 +108,16 @@ def delete_subtopic(request):
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"Subtopic doesnot exist")
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+        
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
 def delete_topic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'id'}.issubset(data.keys()):
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 topic = Master_Topic.objects.get(id = data['id'],is_available = True)
                 topic.is_available = False
@@ -131,19 +127,16 @@ def delete_topic(request):
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
 def update_topic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'id','text'}.issubset(data.keys()):
+        if {'id','text','auth_key'}.issubset(data.keys())  and authenticate(data['auth_key']):
             try:
                 topic = Master_Topic.objects.get(id = data['id'],is_available = True)
                 topic.topic_text = data['text']
@@ -153,18 +146,15 @@ def update_topic(request):
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def update_subtopic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'id','text','topic_id'}.issubset(data.keys()):
+        if {'auth_key','id','text','topic_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 topic = Master_Topic.objects.get(id = data['topic_id'])
                 subtopic = Master_SubTopic.objects.get(id = data['id'])
@@ -179,19 +169,16 @@ def update_subtopic(request):
             except Master_Topic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
 def get_subtopic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'id'}.issubset(data.keys()):
+        if {'id','auth_key'}.issubset(data.keys())  and authenticate(data['auth_key']):
             try:
                 subtopic = Master_SubTopic.objects.get(id = data['id'],is_available = True)
                 topic = subtopic.topic
@@ -209,19 +196,16 @@ def get_subtopic(request):
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"Subtopic doesnot exist")
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
 def get_topic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'id'}.issubset(data.keys()):
+        if {'id','auth_key'}.issubset(data.keys())  and authenticate(data['auth_key']):
             try:
                 topic = Master_Topic.objects.get(id = data['id'])
                 topic_dict = {
@@ -233,12 +217,9 @@ def get_topic(request):
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 
@@ -251,7 +232,7 @@ def get_topic(request):
 def activate_subtopic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'id'}.issubset(data.keys()):
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 subtopic = Master_SubTopic.objects.get(id = data['id'],is_available = False)
                 subtopic.is_available = True
@@ -261,19 +242,16 @@ def activate_subtopic(request):
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"Subtopic doesnot exist")
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
 
 
 @csrf_exempt
 def activate_topic(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        if {'id'}.issubset(data.keys()):
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 topic = Master_Topic.objects.get(id = data['id'],is_available = False)
                 topic.is_available = True
@@ -283,9 +261,6 @@ def activate_topic(request):
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
                 return JsonResponse(resp,status = 203)
-        else:
-            resp = Response(204, "Wrong key value")
-            return JsonResponse(resp,status = 204)
-    else:
-        resp = Response(405,'Bad Request!!')
-        return JsonResponse(resp,status = 405)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
