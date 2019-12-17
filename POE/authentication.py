@@ -29,7 +29,6 @@ def create_key(request):
 
 
 def authenticate(key):
-    print('authenticate method called')
     if key == AUTH_KEY:
         return True
     else:
@@ -43,31 +42,18 @@ def match_token(token):
     date = int(str(time[2].split(':')[0][:2]))
     hour = int(str(time[2].split(':')[0][3:5]))
     minute = int(str(time[2].split(':')[1]))
-    print(date,month,hour,minute)
-    print(token[4:6])
     date_t = int(str(token[4:6]))
     month_t = int(str(token[6:8]))
     if (date_t == date):
-        print('date')
         if month_t == month:
-            print('month')
             first_val = int(str(token[0:4]))
-            print('firstval',first_val)
             hour_t = int(str(token[8:10]))
-            print(hour_t)
             minute_t = int(str(token[10:12]))
-            print(minute_t)
             last_val = int(str(token[12:16]))
-            print('last_val',last_val)
             if ((hour*60 + minute) - (hour_t*60 + minute_t)) <= 1:
-                print('time')
                 hour = hour_t
                 minute = minute_t
                 if first_val == date*minute:
-                    print('first value')
                     if last_val == month*hour:
-                        print('second value')
                         return True
-                        print('true')
-    print('false')
     return False

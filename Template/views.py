@@ -101,6 +101,7 @@ def create_Section(request):
                     negative_marks = data['negative_marks']
                 )
                 section.save()
+                update_marks(section)
             except:
                 resp = Response(203,'template doesnot exist')
                 return JsonResponse(resp,status = 203)
@@ -142,7 +143,30 @@ def update_Section(request):
                 template = Master_Template.objects.get(id = data['template_id'])
                 section.template = template
                 section.save()
+                update_marks(section)
                 resp = Response(200,'section updated successfully')
+                return JsonResponse(resp, status = 200)
+            except Master_Section.DoesNotExist:
+                resp = Response(203,'section doesnot exist')
+                return JsonResponse(resp,status = 203)
+            except Master_Template.DoesNotExist:
+                resp = Response(203,'template doesnot exist')
+                return JsonResponse(resp,status = 203)
+        
+    resp = Response(405,'Wrong Request')
+    return JsonResponse(resp, status = 405)
+
+@csrf_exempt
+def update_Section_marks(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id','marks','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            try:
+                section = Master_Section.objects.get(id = data['id'])
+                section.section_marks = data['marks']
+                section.save()
+                update_marks(section)
+                resp = Response(200,'section marks and template marks updated successfully')
                 return JsonResponse(resp, status = 200)
             except Master_Section.DoesNotExist:
                 resp = Response(203,'section doesnot exist')
@@ -241,7 +265,8 @@ def update_template_section(request):
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
-#update in future
+
+
 @csrf_exempt
 def get_all_template_sections(request):
     if request.method == 'POST':
@@ -249,47 +274,51 @@ def get_all_template_sections(request):
         if {'auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             template_sections_arr = []
             template_sections_dict = {'data':template_sections_arr}
-            temp = {}
             template_sections = Template_Section.objects.filter()
             for template_section in template_sections:
-                section = template_section.section
-                template = section.template
-                subtopic = template_section.subtopic
-                topic = subtopic.topic
-                temp = {
-                    'id':template_section.id,
-                    'difficulty_id':template_section.difficulty_id,
-                    'section':{
-                        'id':section.id,
-                        'name':section.section_name,
-                        'marks':section.section_marks,
-                        'duration':section.section_duration,
-                        'negative_marks':section.negative_marks,
-                        'is_available' : section.is_available,
-                        'template':{
-                            'id':template.id,
-                            'name':template.template_marks,
-                            'marks':template.template_marks,
-                            'duration':template.template_duration,
-                            'is_available':template.is_available,
-                            }
-                        },
-                    'subtopic':{
-                        'id':subtopic.id,
-                        'text':subtopic.subtopic_text,
-                        'is_available':subtopic.is_available,
-                        'topic':{
-                            'id':topic.id,
-                            'text':topic.topic_text,
-                            'is_available':topic.is_available
-                        }
-                    }
-                }
-                template_sections_arr.append(temp)
+                template_sections_arr.append(get_template_section_dict(template_section))
             return JsonResponse(template_sections_dict,status = 200)
     
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
+
+@csrf_exempt
+def get_template_section_id(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'auth_key','id'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            try:
+                template_section =Template_Section.objects.get(id = data['id'])
+                return JsonResponse(get_template_section_dict(template_section),200)
+            except Template_Section.DoesNotExist:
+                resp = Response(203,'template_section doestnot exists')
+                return JsonResponse(resp,status = 203)
+    resp = Response(405,'Wrong Request')
+    return JsonResponse(resp, status = 405)
+
+
+@csrf_exempt
+def get_all_template_section_section_id(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'auth_key','section_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            try:
+                section = Master_Section.objects.get(id = data['section_id'])
+                template_sections_arr = []
+                template_sections_dict = {'data':template_sections_arr}
+                template_sections = Template_Section.objects.filter(section = section)
+                for template_section in template_sections:
+                    template_sections_arr.append(get_template_section_dict(template_section))
+                return JsonResponse(template_sections_dict,status = 200)
+            except Template_Section.DoesNotExist:
+                resp = Response(203,'template_section doestnot exists')
+                return JsonResponse(resp,status = 203)
+            except Master_Section.DoesNotExist:
+                resp = Response(203,'section doestnot exists')
+                return JsonResponse(resp,status = 203)
+    resp = Response(405,'Wrong Request')
+    return JsonResponse(resp, status = 405)
+
 
 @csrf_exempt
 def delete_section_template(request):
@@ -399,3 +428,52 @@ def get_Template(request):
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
+
+    #------------------UTILS---------------------------------------------------------------
+
+def get_template_section_dict(template_section):
+    section = template_section.section
+    template = section.template
+    subtopic = template_section.subtopic
+    topic = subtopic.topic
+    temp = {
+        'id':template_section.id,
+        'difficulty_id':template_section.difficulty_id,
+        'section':{
+            'id':section.id,
+            'name':section.section_name,
+            'marks':section.section_marks,
+            'duration':section.section_duration,
+            'negative_marks':section.negative_marks,
+            'is_available' : section.is_available,
+            'template':{
+                'id':template.id,
+                'name':template.template_marks,
+                'marks':template.template_marks,
+                'duration':template.template_duration,
+                'is_available':template.is_available,
+                }
+            },
+        'subtopic':{
+            'id':subtopic.id,
+            'text':subtopic.subtopic_text,
+            'is_available':subtopic.is_available,
+            'topic':{
+                'id':topic.id,
+                'text':topic.topic_text,
+                'is_available':topic.is_available
+            }
+        }
+    }
+    return temp
+
+
+def update_marks(section):
+    template = section.template
+    t_marks = 0
+    sections_arr = Master_Section.objects.filter(template = template)
+    for section in sections_arr:
+        t_marks = t_marks + section.section_marks    
+    template.template_marks = t_marks
+    template.save()
+    

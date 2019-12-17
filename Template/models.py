@@ -20,3 +20,4 @@ class Template_Section(models.Model):
     no_questions = models.IntegerField()
     difficulty_id = models.SmallIntegerField()  
 
+

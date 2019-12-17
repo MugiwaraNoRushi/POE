@@ -25,5 +25,5 @@ class User_Question_Response(models.Model):
 class User_Test_Status(models.Model):
     exam = models.ForeignKey('Master_Exam',on_delete = models.SET_NULL,null = True)
     user = models.ForeignKey('Users.Master_Users',on_delete = models.SET_NULL,null = True)
-    status = models.SmallIntegerField()
+    status = models.SmallIntegerField() #1 not started 2 in progress 3 completed
     duration = models.IntegerField()

@@ -17,3 +17,4 @@ class Master_Correct_Option(models.Model):
     option = models.ForeignKey('Master_Option',on_delete = models.SET_NULL, null = True)
     question = models.ForeignKey('Master_Question',on_delete = models.SET_NULL, null = True)
     is_available = models.BooleanField(default= True)
+    

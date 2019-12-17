@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from Users.utils import Response
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from POE.authentication import authenticate
 
 @csrf_exempt
 def assign_questions_to_exam(request):
@@ -147,10 +148,68 @@ def scroll_through_exam(request):
 
 @csrf_exempt
 def get_result(request):
-    pass
+    if request.method == 'POST':
+        data =json.loads(request.body.decode('utf-8'))
+        if {'user_id','exam_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            try:
+                exam_obj = Master_Exam.objects.get(id = data['exam_id'])
+                user_obj = Master_Users.objects.get(id = data['user_id'])
+                exam_status = User_Test_Status.objects.get(user = user_obj,exam = exam_obj)
+                if exam_status.status != 3:
+                    resp = Response(203,'Exam has not been completed yet')
+                    return JsonResponse(resp,status = 200)
+                user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
+            except User_Test_Status.DoesNotExist:
+                resp = Response(203,'User_Test_Status doesnot exists')
+                return JsonResponse(resp,status = 203)
+            except Master_Exam.DoesNotExist:
+                resp = Response(203,'Exam doesnot exists')
+                return JsonResponse(resp,status = 203)
+            except Master_Users.DoesNotExist:
+                resp = Response(203,'User doesnot exists')
+                return JsonResponse(resp,status = 203)  
+            except User_Question_Assigned.DoesNotExist:
+                resp = Response(203,'User has not been assigned questions')
+                return JsonResponse(resp,status = 203) 
+            template = exam_obj.template
 
 
+            total_marks = template.template_marks
+            marks_obtained = 0
+            for user_question_assigned in user_question_assigned_arr:
+                try:
+                    user_response_arr = User_Question_Response.objects.filter(section_question = user_question_assigned)
+                    question_assigned = user_question_assigned.question
+                    negative_marks = user_question_assigned.section.negative_marks
+                    correct_options_set = {}
+                    correct_options = Master_Correct_Option.objects.filter(question = question_assigned)
+                    for correct_option in correct_options:
+                        correct_options_set.add(correct_option.option)
 
+                    attempted_options_set = {}
+                    for user_response in user_response_arr:
+                        attempted_options_set.add(user_response.option)
+
+                    if attempted_options_set == correct_options_set:
+                        marks_obtained = marks_obtained + (question_assigned.question_marks * question_assigned.difficulty)                        
+                    else:
+                        marks_obtained = marks_obtained - negative_marks
+
+
+                except User_Question_Response.DoesNotExist:
+                    pass
+        
+        marks_dict = {
+            'marks_obtained':marks_obtained,
+            'total_marks':total_marks
+        }   
+        return JsonResponse(marks_dict,status = 200)         
+         
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)     
+
+
+    #a new model would be better ????
 
 
     
@@ -185,5 +244,6 @@ def soul(question_to_be_fetched,user_question_assigned_arr):
     main_dict['first_question'] = get_single_question(question_to_be_fetched)
     print('here')
     return main_dict
+
 
 
