@@ -226,6 +226,8 @@ def create_template_section(request):
                     no_questions = data['no_question']
                 )
                 temp_section.save()
+                update_section_marks(section)
+
             except Master_Section.DoesNotExist:
                 resp = Response(203,'section doesnot exist')
                 return JsonResponse(resp,status = 203)
@@ -252,6 +254,7 @@ def update_template_section(request):
                 temp_section.difficulty_id = data['difficulty_id']
                 temp_section.no_questions = data['no_question']
                 temp_section.save()
+                update_section_marks(section)
             except Template_Section.DoesNotExist:
                 resp = Response(203,'Template_Section doesnot exist')
                 return JsonResponse(resp,status = 203)
@@ -329,7 +332,9 @@ def delete_section_template(request):
             try:
 
                 temp_section = Template_Section.objects.get(id = data['id'])
+                section = temp_section.section
                 temp_section.delete()
+                update_section_marks(section)
             except Template_Section.DoesNotExist:
                 resp = Response(203,'Template_Section doesnot exist')
                 return JsonResponse(resp,status = 203)
@@ -480,4 +485,16 @@ def update_marks(section):
         t_marks = t_marks + section.section_marks    
     template.template_marks = t_marks
     template.save()
-    
+
+def update_section_marks(section):
+    marks = 0
+    try:
+        template_section_arr = Template_Section.objects.filter(section =section)
+        for template_section in template_section_arr:
+            template_section_marks = template_section.no_questions * template_section.difficulty_id
+            marks = marks + template_section_marks
+    except:
+        pass
+    section.section_marks = marks
+    section.save()
+    update_marks(section)
