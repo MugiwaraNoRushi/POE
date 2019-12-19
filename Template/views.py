@@ -120,6 +120,7 @@ def delete_Section(request):
                 section = Master_Section.objects.get(id = data['id'],is_available = True)
                 section.is_available = False
                 section.save()
+                update_marks(section)
                 resp = Response(200,'section deleted successfully')
                 return JsonResponse(resp, status = 200)
             except:
@@ -471,7 +472,10 @@ def get_template_section_dict(template_section):
 def update_marks(section):
     template = section.template
     t_marks = 0
-    sections_arr = Master_Section.objects.filter(template = template)
+    try:
+        sections_arr = Master_Section.objects.filter(template = template,is_available = True)
+    except:
+        pass
     for section in sections_arr:
         t_marks = t_marks + section.section_marks    
     template.template_marks = t_marks
