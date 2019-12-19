@@ -445,6 +445,7 @@ def get_template_section_dict(template_section):
     temp = {
         'id':template_section.id,
         'difficulty_id':template_section.difficulty_id,
+        'no_questions':template_section.no_questions,
         'section':{
             'id':section.id,
             'name':section.section_name,
