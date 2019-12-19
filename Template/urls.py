@@ -18,10 +18,7 @@ urlpatterns = [
     path('activate/template/',activate_Template,name = 'activate a template'),
     path('get/template/',get_Template,name = 'get single template'),
     path('get/section/',get_Section,name = 'get a single section'),
-    path('get/sectionwithtemplate/',get_template_section_id,'get a single template section'),
-    path('get/all/sectionwithtemplatesbysection/',get_all_template_section_section_id,'get all sectionwithtemplates by section'),
+    path('get/sectionwithtemplate/',get_template_section_id,name = 'get a single template section'),
+    path('get/all/sectionwithtemplatesbysection/',get_all_template_section_section_id,name = 'get all sectionwithtemplates by section'),
     path('update/section/marks',update_Section_marks,name = 'update section marks')
-    
-    #update template marks 
-    #update section_marks
 ]

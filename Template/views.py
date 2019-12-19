@@ -289,7 +289,7 @@ def get_template_section_id(request):
         if {'auth_key','id'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 template_section =Template_Section.objects.get(id = data['id'])
-                return JsonResponse(get_template_section_dict(template_section),200)
+                return JsonResponse(get_template_section_dict(template_section),status = 200)
             except Template_Section.DoesNotExist:
                 resp = Response(203,'template_section doestnot exists')
                 return JsonResponse(resp,status = 203)
