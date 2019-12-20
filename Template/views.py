@@ -73,8 +73,8 @@ def update_template(request):
         if {'id','name','marks','duration','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 template = Master_Template.objects.get(id = data['id'])
-                template.template_name = data['name'],
-                template.template_duration = data['duration'],
+                template.template_name = data['name']
+                template.template_duration = data['duration']
                 template.template_marks = data['marks']
                 template.save()
                 resp = Response(200,'template updated successfully')
@@ -373,6 +373,7 @@ def activate_Section(request):
                 section = Master_Section.objects.get(id = data['id'],is_available = False)
                 section.is_available = True
                 section.save()
+                update_marks(section)
                 resp = Response(200,'section updated successfully')
                 return JsonResponse(resp, status = 200)
             except:

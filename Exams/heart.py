@@ -21,8 +21,8 @@ def assign_questions_to_exam(request):
             template_section_arr_obj = []
             #get a template by using exam_id
             try:
-                exam_obj = Master_Exam.objects.get(id = data['exam_id'])
-                user_obj = Master_Users.objects.get(id = data['user_id'])
+                exam_obj = Master_Exam.objects.get(id = data['exam_id'],is_available = True)
+                user_obj = Master_Users.objects.get(id = data['user_id'],is_available = True)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
                 return JsonResponse(resp,status = 203)
@@ -45,7 +45,7 @@ def assign_questions_to_exam(request):
             #fetch sections based on template
             try:
                 template_obj = exam_obj.template
-                section_arr_obj = Master_Section.objects.filter(template = template_obj)
+                section_arr_obj = Master_Section.objects.filter(template = template_obj,is_available = True)
             except:
                 print('in try block 2 error is with filter of Master sections')
                 resp = Response(203,'Master Section error persists')
@@ -54,7 +54,7 @@ def assign_questions_to_exam(request):
             #fetch all template sections based on sections
             try:
                 for section_obj in section_arr_obj:
-                    temp_temp_section_arr = Template_Section.objects.filter(section =section_obj)
+                    temp_temp_section_arr = Template_Section.objects.filter(section =section_obj,is_available = True)
                     for temp_section in temp_temp_section_arr:
                         template_section_arr_obj.append(temp_section)
             except:
@@ -66,7 +66,7 @@ def assign_questions_to_exam(request):
                 for temp_section_obj in template_section_arr_obj:
                     subtopic_obj = temp_section_obj.subtopic
                     section_obj = temp_section_obj.section
-                    questions = Master_Question.objects.filter(subtopic = subtopic_obj)
+                    questions = Master_Question.objects.filter(subtopic = subtopic_obj,is_available = True)
                     questions = list(questions)
                     for i in range(0,temp_section_obj.no_questions):
                         rand_index = random.randint(0,len(questions)-1)
