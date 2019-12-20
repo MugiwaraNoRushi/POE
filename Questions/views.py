@@ -59,7 +59,7 @@ def delete_question(request):
                 return JsonResponse(resp,status = 200)
             except:
                 resp = Response(203,'Question or Options doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)

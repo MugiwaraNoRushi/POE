@@ -25,10 +25,10 @@ def assign_questions_to_exam(request):
                 user_obj = Master_Users.objects.get(id = data['user_id'],is_available = True)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Users.DoesNotExist:
                 resp = Response(203,'User doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
 
             #CHECKING if question is already assigned
             try:
@@ -41,7 +41,7 @@ def assign_questions_to_exam(request):
                 print('called')
             except Exception as e:
                 resp = Response(203,'Something went wrong')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             #fetch sections based on template
             try:
                 template_obj = exam_obj.template
@@ -49,7 +49,7 @@ def assign_questions_to_exam(request):
             except Master_Section.DoesNotExist:
                 print('in try block 2 error is with filter of Master sections')
                 resp = Response(203,'Master Section error persists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
 
             #fetch all template sections based on sections
             try:
@@ -60,7 +60,7 @@ def assign_questions_to_exam(request):
             except Template_Section.DoesNotExist:
                 print('in try block 3 error is with template_Section or with appending the objects')
                 resp = Response(203,'Template Section error persists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
 
             try:
                 for temp_section_obj in template_section_arr_obj:
@@ -90,7 +90,7 @@ def assign_questions_to_exam(request):
             except Exception as e:
                 print(e)
                 resp = Response(203,'Question Subtopic error persists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             #FINAL RESULT TO SEND
             user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
             question = user_question_assigned_arr[0].question
@@ -120,10 +120,10 @@ def scroll_through_exam(request):
                 #will use that question in calling soul
             except User_Question_Response.DoesNotExist:
                 resp = Response(203,'Response doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Question.DoesNotExist:
                 resp = Response(203,'Wrong Next Question id and it doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             
             #fetch exam and user
             try:
@@ -131,10 +131,10 @@ def scroll_through_exam(request):
                 user_obj = Master_Users.objects.get(id = data['user_id'])
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Users.DoesNotExist:
                 resp = Response(203,'User doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
 
             user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
             return JsonResponse(soul(question,user_question_assigned_arr),status = 200)
@@ -161,16 +161,16 @@ def get_result(request):
                 user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
             except User_Test_Status.DoesNotExist:
                 resp = Response(203,'User_Test_Status doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Users.DoesNotExist:
                 resp = Response(203,'User doesnot exists')
-                return JsonResponse(resp,status = 203)  
+                return JsonResponse(resp,status  = 200)  
             except User_Question_Assigned.DoesNotExist:
                 resp = Response(203,'User has not been assigned questions')
-                return JsonResponse(resp,status = 203) 
+                return JsonResponse(resp,status  = 200) 
             template = exam_obj.template
 
 

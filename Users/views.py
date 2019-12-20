@@ -21,13 +21,13 @@ def validate(request):
                         password = data['password']
                 else:
                         resp = Response(401,"Bad Request")
-                        return JsonResponse(resp,status = 204)
+                        return JsonResponse(resp,status  = 200)
                 try:
                         user_obj = User_Credentials.objects.get(user_name =  username,password = password,is_active = True)
                         return get_user(request)
                 except User_Credentials.DoesNotExist:
                         resp = Response(203,"Your Credentials are incorrect, Please try again")
-                        return JsonResponse(resp,status = 203)
+                        return JsonResponse(resp,status  = 200)
                 except:
                         resp = Response(477, Exception)
                         return JsonResponse(resp,status = 477)
@@ -52,13 +52,13 @@ def signup(request):
                                 if (now - temp.entry_time < difference):
                                 #can also change status to show this
                                         resp = Response(203, "Email already resgistered and check mail")
-                                        return JsonResponse(resp,status = 203)
+                                        return JsonResponse(resp,status  = 200)
                         except Temp_Master_Users.DoesNotExist:
                                 print("new email id ")
                         try:
                                 temp = Master_Users.objects.get(email = email)
                                 resp = Response(203, "Email already resgistered and try login ")
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
                         except Master_Users.DoesNotExist:
                                 print("new email id ")
                         city_id = data['city_id']
@@ -133,12 +133,12 @@ def validate_registration(request):
                                         return JsonResponse(resp,status = 200)
                                 else:
                                         resp = Response(203, "The token has expired, Please try signing up again")
-                                        return JsonResponse(resp,status = 203)
+                                        return JsonResponse(resp,status  = 200)
 
                         except Temp_Master_Users.DoesNotExist:
                                 #change the message to a proper message
                                 resp = Response(203,"Wrong Registration Number !!")
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -152,7 +152,7 @@ def check_username(request):
                         data = json.loads(request.body.decode('utf-8'))
                         user_cred = User_Credentials.objects.get(user_name = data['username'])
                         resp = Response(203,"Username exists and You cannot use it")
-                        return JsonResponse(resp,status = 203)
+                        return JsonResponse(resp,status  = 200)
                 except:
                         resp = Response(200,"True")
                         return JsonResponse(resp,status = 200)
@@ -181,10 +181,10 @@ def change_password(request):
                                         return JsonResponse(resp,status = 200)
                                 else:
                                         resp = Response(203,"Current password is incorrect !!")
-                                        return JsonResponse(resp,status = 203)
+                                        return JsonResponse(resp,status  = 200)
                         except User_Credentials.DoesNotExist:
                                 resp = Response(203, "Wrong user name ")
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
         
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
@@ -204,7 +204,7 @@ def get_user_by_id(request):
 
                         except User_Credentials.DoesNotExist:
                                 resp = Response(203, "user doesnot exists")
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
 
         resp = Response(405,'Bad Request!!')
@@ -222,7 +222,7 @@ def get_user(request):
 
                         except User_Credentials.DoesNotExist:
                                 resp = Response(203, "username doesnot exists")
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
                
         resp = Response(405,'Bad Request!!')
@@ -256,7 +256,7 @@ def delete_user(request):
                                 user_cred_obj = User_Credentials.objects.get(user = user_obj)
                         except:
                                 resp = Response(203,'User does not exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
                         user_obj.is_available = False
                         user_obj.save()
@@ -281,7 +281,7 @@ def activate_user(request):
                                 user_cred_obj = User_Credentials.objects.get(user = user_obj)
                         except:
                                 resp = Response(203,'User does not exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
                         user_obj.is_available = True
                         user_obj.save()
@@ -331,7 +331,7 @@ def get_group(request):
                                 return JsonResponse(get_group_dict(group), status = 200)
                         except:
                                 resp = Response(203,'Group doesnot exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
                
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
@@ -367,7 +367,7 @@ def add_user_to_group(request):
                                 group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
                         except:
                                 resp = Response(203,'Group doesnot exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
                         user_arr = data['user_array']
                         for i in range(0,len(user_arr)):
                                 user_obj = Master_Users.objects.get(id = user_arr[i])
@@ -391,7 +391,7 @@ def remove_user_from_group(request):
                                 group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
                         except:
                                 resp = Response(203,'Group doesnot exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
                         user_arr = data['user_array']
                         for i in range(0,len(user_arr)):
@@ -417,7 +417,7 @@ def get_users_from_group(request):
 
                         except:
                                 resp = Response(203,'Group doesnot exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
                         arr_dict = []
                         data_dict = {
@@ -444,7 +444,7 @@ def get_groups_from_user(request):
 
                         except:
                                 resp = Response(203,'Groups do not exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
                         arr_dict = []
                         data_dict = {
@@ -468,7 +468,7 @@ def modify_group(request):
                                 group_obj = Master_Groups.objects.get(id = data['group_id'])
                         except:
                                 resp = Response(203,'Group does not exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
                         group_obj.group_name = data['group_name']
                         group_obj.save()
@@ -488,7 +488,7 @@ def delete_group(request):
                                 group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
                         except:
                                 resp = Response(203,'Group doesnot exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
                         group_obj.is_available = False
                         group_obj.save()
@@ -507,7 +507,7 @@ def activate_group(request):
                                 group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = False)
                         except:
                                 resp = Response(203,'Group doesnot exists')
-                                return JsonResponse(resp,status = 203)
+                                return JsonResponse(resp,status  = 200)
 
                         group_obj.is_available = True
                         group_obj.save()
@@ -603,7 +603,7 @@ def add_city(request):
                         try:
                                 city = Master_City.objects.get(city_text = data['text'])
                                 resp = Response(203,'City already exists ')
-                                return JsonResponse(resp, status = 203)
+                                return JsonResponse(resp, status  = 200)
                         except:
                                 city = Master_City.objects.create(city_text = data['text'])
                                 city.save()

@@ -15,7 +15,7 @@ def create_topic(request):
             try:
                 topic = Master_Topic.objects.get(topic_text = data['text'])
                 resp = Response(203,"Topic already exists")
-                return JsonResponse(resp, status = 203)
+                return JsonResponse(resp, status  = 200)
             except Master_Topic.DoesNotExist:
                 topic = Master_Topic.objects.create(topic_text = data['text'])
                 topic.save()
@@ -35,7 +35,7 @@ def create_subtopic(request):
                 topic = Master_Topic.objects.get(id = data['topic_id'])
                 subtopic = Master_SubTopic.objects.get(subtopic_text = data['text'],topic = data['topic_id'])
                 resp = Response(203,"SubTopic already exists")
-                return JsonResponse(resp, status = 203)
+                return JsonResponse(resp, status  = 200)
             except Master_SubTopic.DoesNotExist:
                 subtopic = Master_SubTopic.objects.create(subtopic_text = data['text'],topic = topic)
                 subtopic.save()
@@ -107,7 +107,7 @@ def delete_subtopic(request):
                 return JsonResponse(resp, status = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"Subtopic doesnot exist")
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -126,7 +126,7 @@ def delete_topic(request):
                 return JsonResponse(resp, status = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -145,7 +145,7 @@ def update_topic(request):
                 return JsonResponse(resp, status = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -165,10 +165,10 @@ def update_subtopic(request):
                 return JsonResponse(resp, status = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"Subtopic doesnot exist")
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Topic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -195,7 +195,7 @@ def get_subtopic(request):
                 return JsonResponse(subtopic_dict,status = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"Subtopic doesnot exist")
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -216,7 +216,7 @@ def get_topic(request):
                 return JsonResponse(topic_dict,status = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -241,7 +241,7 @@ def activate_subtopic(request):
                 return JsonResponse(resp, status = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"Subtopic doesnot exist")
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -260,7 +260,7 @@ def activate_topic(request):
                 return JsonResponse(resp, status = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203,"topic doesnot exist")
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)

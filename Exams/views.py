@@ -32,10 +32,10 @@ def create_exam(request):
                 return JsonResponse(resp,status = 200)
             except Master_Template.DoesNotExist:
                 resp = Response(203,'Template doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Groups.DoesNotExist:
                 resp = Response(203,'Group doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -51,7 +51,7 @@ def get_exam(request):
                 return JsonResponse(get_exam_dict(exam),status = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -70,7 +70,7 @@ def get_all_exams(request):
                 return JsonResponse(exams_dict,status = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -98,13 +98,13 @@ def update_exam(request):
                 return JsonResponse(resp,status = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Template.DoesNotExist:
                 resp = Response(203,'Template doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Groups.DoesNotExist:
                 resp = Response(203,'Group doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
        
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -122,7 +122,7 @@ def delete_exam(request):
                 return JsonResponse(resp,status = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
        
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -147,10 +147,10 @@ def create_user_test(request):
                 return JsonResponse(resp,status = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Users.DoesNotExist:
                 resp = Response(203,'User doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -172,13 +172,13 @@ def update_user_test(request):
 
             except User_Test_Status.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Exam.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Users.DoesNotExist:
                 resp = Response(203,'User doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -195,7 +195,7 @@ def delete_user_test(request):
                 return JsonResponse(resp,status = 200)
             except User_Test_Status.DoesNotExist:
                 resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
        
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -212,10 +212,10 @@ def get_all_exams_user(request):
                 group_mappings = User_Group_Mapping.objects.filter(user = user)
             except Master_Users.DoesNotExist:
                 resp = Response(204,'User doesnot exist ')
-                return JsonResponse(resp,status = 204)
+                return JsonResponse(resp,status  = 200)
             except User_Group_Mapping.DoesNotExist:
                 resp = Response(204,'user and group do not match')
-                return JsonResponse(resp,status = 204)
+                return JsonResponse(resp,status  = 200)
             exams_arr = []
             exams_dict = {'data':exams_arr}
             for group_mapping in group_mappings:

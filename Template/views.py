@@ -39,7 +39,7 @@ def delete_Template(request):
                 return JsonResponse(resp, status = 200)
             except:
                 resp = Response(203,'template doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -82,7 +82,7 @@ def update_template(request):
                 return JsonResponse(resp, status = 200)
             except:
                 resp = Response(203,'template doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -105,7 +105,7 @@ def create_Section(request):
                 update_marks(section)
             except:
                 resp = Response(203,'template doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             resp = Response(200,'section created successfully')
             return JsonResponse(resp,status = 200)
     
@@ -126,7 +126,7 @@ def delete_Section(request):
                 return JsonResponse(resp, status = 200)
             except:
                 resp = Response(203,'section doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -150,10 +150,10 @@ def update_Section(request):
                 return JsonResponse(resp, status = 200)
             except Master_Section.DoesNotExist:
                 resp = Response(203,'section doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Template.DoesNotExist:
                 resp = Response(203,'template doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -172,10 +172,10 @@ def update_Section_marks(request):
                 return JsonResponse(resp, status = 200)
             except Master_Section.DoesNotExist:
                 resp = Response(203,'section doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Template.DoesNotExist:
                 resp = Response(203,'template doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -221,7 +221,7 @@ def get_all_Sections_template(request):
                 template = Master_Template.objects.get(id = data['template_id'])
             except:
                 resp = Response(203,'template doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             sections_arr = []
             sections_dict = {'data':sections_arr}
             temp = {}
@@ -274,13 +274,13 @@ def create_template_section(request):
                     return JsonResponse(resp,status = 200)
                 else:
                     resp = Response(203,'not enough questions available')
-                    return JsonResponse(resp,status = 203)
+                    return JsonResponse(resp,status  = 200)
             except Master_Section.DoesNotExist:
                 resp = Response(203,'section doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203, 'subtopic doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             
     
     resp = Response(405,'Wrong Request')
@@ -306,16 +306,16 @@ def update_template_section(request):
                     return JsonResponse(resp,status = 200)
                 else:
                     resp = Response(203,'not enough questions available')
-                    return JsonResponse(resp,status = 203)
+                    return JsonResponse(resp,status  = 200)
             except Template_Section.DoesNotExist:
                 resp = Response(203,'Template_Section doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Section.DoesNotExist:
                 resp = Response(203,'section doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203, 'subtopic doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -346,7 +346,7 @@ def get_template_section_id(request):
                 return JsonResponse(get_template_section_dict(template_section),status = 200)
             except Template_Section.DoesNotExist:
                 resp = Response(203,'template_section doestnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
@@ -366,10 +366,10 @@ def get_all_template_section_section_id(request):
                 return JsonResponse(template_sections_dict,status = 200)
             except Template_Section.DoesNotExist:
                 resp = Response(203,'template_section doestnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             except Master_Section.DoesNotExist:
                 resp = Response(203,'section doestnot exists')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
@@ -387,7 +387,7 @@ def delete_section_template(request):
                 update_section_marks(section)
             except Template_Section.DoesNotExist:
                 resp = Response(203,'Template_Section doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
             resp = Response(200,'template_section deleted successfully')
             return JsonResponse(resp,status = 200)
         
@@ -408,7 +408,7 @@ def activate_Template(request):
                 return JsonResponse(resp, status = 200)
             except:
                 resp = Response(203,'template doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -428,7 +428,7 @@ def activate_Section(request):
                 return JsonResponse(resp, status = 200)
             except:
                 resp = Response(203,'section doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
        
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -459,7 +459,7 @@ def get_Section(request):
                 return JsonResponse(section_dict, status = 200)
             except:
                 resp = Response(203,'section doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status  = 200)
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -481,7 +481,7 @@ def get_Template(request):
                 return JsonResponse(temp, status = 200)
             except:
                 resp = Response(203,'template doesnot exist')
-                return JsonResponse(resp,status = 203)
+                return JsonResponse(resp,status = 200)
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)

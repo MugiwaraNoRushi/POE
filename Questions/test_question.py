@@ -19,7 +19,7 @@ def add_questions(request):
     except:
         print('in try 1 maybe a subtopic error ')
         resp = Response(204, "Wrong key value pair in try part 0")
-        return JsonResponse(resp,status = 204)
+        return JsonResponse(resp,status  = 200)
 
 
     try:
@@ -44,7 +44,7 @@ def add_questions(request):
         print('error in for looop 1')
         print(e)
         resp = Response(204, "Wrong key value pair in try part 1")
-        return JsonResponse(resp,status = 204)
+        return JsonResponse(resp,status  = 200)
 
 
     try:
@@ -67,7 +67,7 @@ def add_questions(request):
     except:
         print('error in for loop 2')
         resp = Response(204, "Wrong key value pair in try part 2")
-        return JsonResponse(resp,status = 204)
+        return JsonResponse(resp,status  = 200)
 
 
     try:
@@ -90,7 +90,7 @@ def add_questions(request):
     except:
         print('error in for loop 3')
         resp = Response(204, "Wrong key value pair in try part 3")
-        return JsonResponse(resp,status = 204)
+        return JsonResponse(resp,status  = 200)
 
     resp = Response(200, "Questionssss added successfully")
     return JsonResponse(resp,status = 200)  
