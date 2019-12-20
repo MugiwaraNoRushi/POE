@@ -212,6 +212,47 @@ def get_all_Sections(request):
     return JsonResponse(resp, status = 405)
 
 @csrf_exempt
+def get_all_Sections_template(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'auth_key','template_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            try:
+                template = Master_Template.objects.get(id = data['template_id'])
+            except:
+                resp = Response(203,'template doesnot exist')
+                return JsonResponse(resp,status = 203)
+            sections_arr = []
+            sections_dict = {'data':sections_arr}
+            temp = {}
+            try:
+                sections = Master_Section.objects.filter(template = template)
+            except:
+                return JsonResponse(sections_dict,status = 200)
+            for section in sections:
+                template = section.template
+                temp = {
+                    'id':section.id,
+                    'name':section.section_name,
+                    'marks':section.section_marks,
+                    'duration':section.section_duration,
+                    'negative_marks':section.negative_marks,
+                    'is_available':section.is_available,
+                    'template':{
+                        'id':template.id,
+                        'name':template.template_name,
+                        'marks':template.template_marks,
+                        'duration':template.template_duration,
+                        'is_available':template.is_available,
+                    }
+                }
+                sections_arr.append(temp)
+            return JsonResponse(sections_dict,status = 200)
+    
+    resp = Response(405,'Wrong Request')
+    return JsonResponse(resp, status = 405)
+
+
+@csrf_exempt
 def create_template_section(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))

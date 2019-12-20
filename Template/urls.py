@@ -20,6 +20,7 @@ urlpatterns = [
     path('get/section/',get_Section,name = 'get a single section'),
     path('get/sectionwithtemplate/',get_template_section_id,name = 'get a single template section'),
     path('get/all/sectionwithtemplatesbysection/',get_all_template_section_section_id,name = 'get all sectionwithtemplates by section'),
-    path('update/section/marks',update_Section_marks,name = 'update section marks')
+    path('update/section/marks',update_Section_marks,name = 'update section marks'),
+    path('get/all/sections/template/',get_all_Sections_template,name = 'get all sections based on template id')
 ]
 #fetch all sections based on template
