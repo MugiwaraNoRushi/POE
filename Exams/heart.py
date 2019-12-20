@@ -113,6 +113,8 @@ def scroll_through_exam(request):
                 user_response = User_Question_Response.objects.get(section_question = data['question_assigned_id'])
                 option_obj = Master_Option.objects.get(id = data['option_id'])
                 user_response.option = option_obj
+            except Master_Option.DoesNotExist:
+                pass
                 user_response.marked = data['marked']
                 user_response.save()
                 #question fetched
@@ -124,6 +126,7 @@ def scroll_through_exam(request):
             except Master_Question.DoesNotExist:
                 resp = Response(203,'Wrong Next Question id and it doesnot exists')
                 return JsonResponse(resp,status  = 200)
+            
             
             #fetch exam and user
             try:
