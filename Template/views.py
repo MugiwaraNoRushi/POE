@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from Template.models import *
 from POE.authentication import authenticate
+from Questions.models import *
 
 # make a duplicate template
 @csrf_exempt
@@ -260,23 +261,27 @@ def create_template_section(request):
             try:
                 section = Master_Section.objects.get(id = data['section_id'],is_available = True)
                 subtopic = Master_SubTopic.objects.get(id = data['subtopic_id'],is_available = True)
-                temp_section = Template_Section.objects.create(
-                    section =section,
-                    subtopic = subtopic,
-                    difficulty_id = data['difficulty_id'],
-                    no_questions = data['no_question']
-                )
-                temp_section.save()
-                update_section_marks(section)
-
+                if check_template_section(subtopic,data['difficulty_id'],data['no_question']):
+                    temp_section = Template_Section.objects.create(
+                        section =section,
+                        subtopic = subtopic,
+                        difficulty_id = data['difficulty_id'],
+                        no_questions = data['no_question']
+                    )
+                    temp_section.save()
+                    update_section_marks(section)
+                    resp = Response(200,'template_section created successfully')
+                    return JsonResponse(resp,status = 200)
+                else:
+                    resp = Response(203,'not enough questions available')
+                    return JsonResponse(resp,status = 203)
             except Master_Section.DoesNotExist:
                 resp = Response(203,'section doesnot exist')
                 return JsonResponse(resp,status = 203)
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203, 'subtopic doesnot exist')
                 return JsonResponse(resp,status = 203)
-            resp = Response(200,'template_section created successfully')
-            return JsonResponse(resp,status = 200)
+            
     
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
@@ -289,13 +294,19 @@ def update_template_section(request):
             try:
                 section = Master_Section.objects.get(id = data['section_id'],is_available = True)
                 subtopic = Master_SubTopic.objects.get(id = data['subtopic_id'],is_available = True)
-                temp_section = Template_Section.objects.get(id = data['id'])
-                temp_section.section =section
-                temp_section.subtopic = subtopic
-                temp_section.difficulty_id = data['difficulty_id']
-                temp_section.no_questions = data['no_question']
-                temp_section.save()
-                update_section_marks(section)
+                if check_template_section(subtopic,data['difficulty_id'],data['no_question']):
+                    temp_section = Template_Section.objects.get(id = data['id'])
+                    temp_section.section =section
+                    temp_section.subtopic = subtopic
+                    temp_section.difficulty_id = data['difficulty_id']
+                    temp_section.no_questions = data['no_question']
+                    temp_section.save()
+                    update_section_marks(section)
+                    resp = Response(200,'template_section updated successfully')
+                    return JsonResponse(resp,status = 200)
+                else:
+                    resp = Response(203,'not enough questions available')
+                    return JsonResponse(resp,status = 203)
             except Template_Section.DoesNotExist:
                 resp = Response(203,'Template_Section doesnot exist')
                 return JsonResponse(resp,status = 203)
@@ -305,9 +316,7 @@ def update_template_section(request):
             except Master_SubTopic.DoesNotExist:
                 resp = Response(203, 'subtopic doesnot exist')
                 return JsonResponse(resp,status = 203)
-            resp = Response(200,'template_section updated successfully')
-            return JsonResponse(resp,status = 200)
-        
+            
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
@@ -541,3 +550,10 @@ def update_section_marks(section):
     section.section_marks = marks
     section.save()
     update_marks(section)
+
+def check_template_section(subtopic,difficulty_id,no_questions):
+    questions = Master_Question.objects.filter(subtopic = subtopic,difficulty = difficulty_id)
+    if len(questions)>=no_questions:
+        return True
+    else:
+        return False
