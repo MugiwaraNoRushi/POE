@@ -23,4 +23,3 @@ urlpatterns = [
     path('update/section/marks',update_Section_marks,name = 'update section marks'),
     path('get/all/sections/template/',get_all_Sections_template,name = 'get all sections based on template id')
 ]
-#fetch all sections based on template

@@ -46,7 +46,7 @@ def assign_questions_to_exam(request):
             try:
                 template_obj = exam_obj.template
                 section_arr_obj = Master_Section.objects.filter(template = template_obj,is_available = True)
-            except:
+            except Master_Section.DoesNotExist:
                 print('in try block 2 error is with filter of Master sections')
                 resp = Response(203,'Master Section error persists')
                 return JsonResponse(resp,status = 203)
@@ -54,10 +54,10 @@ def assign_questions_to_exam(request):
             #fetch all template sections based on sections
             try:
                 for section_obj in section_arr_obj:
-                    temp_temp_section_arr = Template_Section.objects.filter(section =section_obj,is_available = True)
+                    temp_temp_section_arr = Template_Section.objects.filter(section =section_obj)
                     for temp_section in temp_temp_section_arr:
                         template_section_arr_obj.append(temp_section)
-            except:
+            except Template_Section.DoesNotExist:
                 print('in try block 3 error is with template_Section or with appending the objects')
                 resp = Response(203,'Template Section error persists')
                 return JsonResponse(resp,status = 203)
