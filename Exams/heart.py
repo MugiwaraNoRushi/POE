@@ -66,7 +66,7 @@ def assign_questions_to_exam(request):
                 for temp_section_obj in template_section_arr_obj:
                     subtopic_obj = temp_section_obj.subtopic
                     section_obj = temp_section_obj.section
-                    questions = Master_Question.objects.filter(subtopic = subtopic_obj,is_available = True)
+                    questions = Master_Question.objects.filter(subtopic = subtopic_obj,is_available = True,difficulty = temp_section_obj.difficulty_id)
                     questions = list(questions)
                     for i in range(0,temp_section_obj.no_questions):
                         rand_index = random.randint(0,len(questions)-1)
