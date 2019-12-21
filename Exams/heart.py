@@ -228,6 +228,7 @@ def soul(question_to_be_fetched,user_question_assigned_arr):
         user_response = User_Question_Response.objects.get(section_question = user_question_assigned_obj)
         user_question_response_arr.append(user_response)
     
+    response_option_id = 0
     main_arr = []
     main_dict = {
         "data":main_arr
@@ -243,9 +244,14 @@ def soul(question_to_be_fetched,user_question_assigned_arr):
             temp_obj['response'] = False
         else:
             temp_obj['response'] = True
+            if question == question_to_be_fetched:
+                response_option_id = User_Question_Response.objects.get(section_question = user_question_assigned_arr[i]).option.id
+
+
         main_arr.append(temp_obj)
+
     main_dict['first_question'] = get_single_question(question_to_be_fetched)
-    print('here')
+    main_dict['response_option_id'] = response_option_id
     return main_dict
 
 
