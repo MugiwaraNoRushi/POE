@@ -100,14 +100,14 @@ def assign_questions_to_exam(request):
     return JsonResponse(resp,status = 405)
 
 
-
+#,'auth_key' and authenticate(data['auth_key'])
 
 #new method
 @csrf_exempt
 def scroll_through_exam(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'question_assigned_id','option_id','marked','next_question_id','user_id','exam_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+        if {'question_assigned_id','option_id','marked','next_question_id','user_id','exam_id'}.issubset(data.keys()):
             try:
                 #response saved
                 user_response = User_Question_Response.objects.get(section_question = data['question_assigned_id'])
@@ -115,18 +115,17 @@ def scroll_through_exam(request):
                 user_response.option = option_obj
             except Master_Option.DoesNotExist:
                 pass
-                user_response.marked = data['marked']
-                user_response.save()
-                #question fetched
-                question = Master_Question.objects.get(id = data['next_question_id'])
-                #will use that question in calling soul
             except User_Question_Response.DoesNotExist:
                 resp = Response(203,'Response doesnot exists')
                 return JsonResponse(resp,status  = 200)
             except Master_Question.DoesNotExist:
                 resp = Response(203,'Wrong Next Question id and it doesnot exists')
                 return JsonResponse(resp,status  = 200)
-            
+            user_response.marked = data['marked']
+            user_response.save()
+            #question fetched
+            question = Master_Question.objects.get(id = data['next_question_id'])
+            #will use that question in calling soul
             
             #fetch exam and user
             try:
