@@ -100,14 +100,14 @@ def assign_questions_to_exam(request):
     return JsonResponse(resp,status = 405)
 
 
-#,'auth_key' and authenticate(data['auth_key'])
+#
 
 #new method
 @csrf_exempt
 def scroll_through_exam(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'question_assigned_id','option_id','marked','next_question_id','user_id','exam_id'}.issubset(data.keys()):
+        if {'question_assigned_id','option_id','marked','next_question_id','user_id','exam_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 #response saved
                 user_response = User_Question_Response.objects.get(section_question = data['question_assigned_id'])
