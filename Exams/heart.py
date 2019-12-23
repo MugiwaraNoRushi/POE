@@ -114,7 +114,7 @@ def scroll_through_exam(request):
                 option_obj = Master_Option.objects.get(id = data['option_id'])
                 user_response.option = option_obj
             except Master_Option.DoesNotExist:
-                pass
+                user_response.option = None
             except User_Question_Response.DoesNotExist:
                 resp = Response(203,'Response doesnot exists')
                 return JsonResponse(resp,status  = 200)
