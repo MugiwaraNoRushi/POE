@@ -35,14 +35,13 @@ def assign_questions_to_exam(request):
                 user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
                 if len(user_question_assigned_arr) > 0:
                     question = user_question_assigned_arr[0].question
-                    print(question)
-                    return JsonResponse(soul(question,user_question_assigned_arr),status = 200)
+                    user_test_status = User_Test_Status.objects.get(user = user_obj,exam = exam_obj)
+                    if user_test_status.attempts <=0:
+                        resp = Response(203,'Attempts have been finished')
+                        return JsonResponse(resp,status = 200)
+                    return JsonResponse(soul(exam_obj,user_obj,question,user_question_assigned_arr,-1),status = 200)
             except User_Question_Assigned.DoesNotExist:
-                print('called')
-            except Exception as e:
-                resp = Response(203,'Something went wrong')
-                return JsonResponse(resp,status  = 200)
-            #fetch sections based on template
+                pass
             try:
                 template_obj = exam_obj.template
                 section_arr_obj = Master_Section.objects.filter(template = template_obj,is_available = True)
@@ -94,7 +93,7 @@ def assign_questions_to_exam(request):
             #FINAL RESULT TO SEND
             user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
             question = user_question_assigned_arr[0].question
-            return JsonResponse(soul(question,user_question_assigned_arr),status = 200)
+            return JsonResponse(soul(exam_obj,user_obj,question,user_question_assigned_arr,template_obj.duration*60),status = 200)
         
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
@@ -107,7 +106,7 @@ def assign_questions_to_exam(request):
 def scroll_through_exam(request):
     if request.method == 'POST':
         data =json.loads(request.body.decode('utf-8'))
-        if {'question_assigned_id','option_id','marked','next_question_id','user_id','exam_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+        if {'question_assigned_id','option_id','marked','next_question_id','user_id','exam_id','auth_key','duration'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
                 #response saved
                 user_response = User_Question_Response.objects.get(section_question = data['question_assigned_id'])
@@ -139,7 +138,7 @@ def scroll_through_exam(request):
                 return JsonResponse(resp,status  = 200)
 
             user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
-            return JsonResponse(soul(question,user_question_assigned_arr),status = 200)
+            return JsonResponse(soul(exam_obj,user_obj,question,user_question_assigned_arr,data['duration']),status = 200)
 
        
     resp = Response(405,'Bad Request!!')
@@ -211,8 +210,6 @@ def get_result(request):
     return JsonResponse(resp,status = 405)     
 
 
-    #a new model would be better ????
-
 
     
 #-------------------UTILS METHODS ---------------------------------------------------
@@ -220,7 +217,30 @@ def get_result(request):
 
 
 
-def soul(question_to_be_fetched,user_question_assigned_arr):
+def soul(exam,user,question_to_be_fetched,user_question_assigned_arr,duration):
+
+    try:
+        user_test_status = User_Test_Status.objects.get(user = user,exam = exam)
+        if duration == -1:
+            print('if')
+            user_test_status.attempts -= 1
+            pass
+        else:
+            user_test_status.duration = duration
+            print('else')
+        user_test_status.save()
+
+    except User_Test_Status.DoesNotExist:
+        print('except')
+        user_test_status = User_Test_Status.objects.create(
+            exam = exam,
+            user = user,
+            status = 2,
+            duration = duration
+        )
+        user_test_status.save()
+        
+
     user_question_response_arr = []
 
     for user_question_assigned_obj in user_question_assigned_arr:
@@ -251,6 +271,7 @@ def soul(question_to_be_fetched,user_question_assigned_arr):
 
     main_dict['first_question'] = get_single_question(question_to_be_fetched)
     main_dict['response_option_id'] = response_option_id
+    main_dict['duration'] = user_test_status.duration
     return main_dict
 
 

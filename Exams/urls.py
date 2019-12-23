@@ -9,8 +9,6 @@ urlpatterns = [
     path('update/exam/',update_exam,name = 'update a exam'),
     path('delete/exam/',delete_exam,name = 'delete a exam'),
     path('get/all/exams/by/user/',get_all_exams_user,name = 'get all exams by user'),
-    path('create/user/test/status/',create_user_test,name = 'create a user test status'),
-    path('update/user/test/status/',update_user_test,name = 'update a user test status'),
     path('delete/user/test/status/',delete_user_test,name = 'delete a user test status'),
     #path('get/user/test/status/all/'),
     path('start/exam/',assign_questions_to_exam,name = 'start exam ; doesnot matter for first time or aftermore'),

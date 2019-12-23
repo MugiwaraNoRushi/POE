@@ -128,60 +128,6 @@ def delete_exam(request):
     return JsonResponse(resp,status = 405)
 
 
-@csrf_exempt
-def create_user_test(request):
-    if request.method == 'POST':
-        data =json.loads(request.body.decode('utf-8'))
-        if {'exam_id','user_id','status','duration','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
-            try:
-                exam = Master_Exam.objects.get(id = data['exam_id'])
-                user = Master_Users.objects.get(id = data['user_id'])
-                user_test_status = User_Test_Status.objects.create(
-                    exam = exam,
-                    user = user,
-                    status = data['status'],
-                    duration = data['duration']
-                )
-                user_test_status.save()
-                resp = Response(200,'user_test_status created successfully')
-                return JsonResponse(resp,status = 200)
-            except Master_Exam.DoesNotExist:
-                resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status  = 200)
-            except Master_Users.DoesNotExist:
-                resp = Response(203,'User doesnot exists')
-                return JsonResponse(resp,status  = 200)
-    
-    resp = Response(405,'Bad Request!!')
-    return JsonResponse(resp,status = 405)
-
-
-
-@csrf_exempt
-def update_user_test(request):
-    if request.method == 'POST':
-        data =json.loads(request.body.decode('utf-8'))
-        if {'id','status','duration','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
-            try:
-                user_test_status = User_Test_Status.objects.get(id = data['id'])
-                user_test_status.status = data['status']
-                user_test_status.duration = data['duration']
-                user_test_status.save()
-                resp = Response(200,'user_test_status updated successfully')
-                return JsonResponse(resp,status = 200)
-
-            except User_Test_Status.DoesNotExist:
-                resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status  = 200)
-            except Master_Exam.DoesNotExist:
-                resp = Response(203,'Exam doesnot exists')
-                return JsonResponse(resp,status  = 200)
-            except Master_Users.DoesNotExist:
-                resp = Response(203,'User doesnot exists')
-                return JsonResponse(resp,status  = 200)
-        
-    resp = Response(405,'Bad Request!!')
-    return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def delete_user_test(request):
