@@ -93,15 +93,12 @@ def assign_questions_to_exam(request):
             #FINAL RESULT TO SEND
             user_question_assigned_arr = User_Question_Assigned.objects.filter(exam = exam_obj,user = user_obj)
             question = user_question_assigned_arr[0].question
-            return JsonResponse(soul(exam_obj,user_obj,question,user_question_assigned_arr,template_obj.duration*60),status = 200)
+            return JsonResponse(soul(exam_obj,user_obj,question,user_question_assigned_arr,template_obj.template_duration*60),status = 200)
         
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
 
 
-#
-
-#new method
 @csrf_exempt
 def scroll_through_exam(request):
     if request.method == 'POST':
@@ -123,8 +120,12 @@ def scroll_through_exam(request):
             user_response.marked = data['marked']
             user_response.save()
             #question fetched
-            question = Master_Question.objects.get(id = data['next_question_id'])
-            #will use that question in calling soul
+            if data['next_question_id'] != 0:
+                question = Master_Question.objects.get(id = data['next_question_id'])
+            else:
+                #no question to be fetched, final question 
+                question = None
+
             
             #fetch exam and user
             try:
@@ -210,8 +211,21 @@ def get_result(request):
     return JsonResponse(resp,status = 405)     
 
 
+@csrf_exempt
+def finish_exam(request):
+    if request.method == 'POST':
+        data =json.loads(request.body.decode('utf-8'))
+        if {'user_id','exam_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            pass
 
-    
+
+
+
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405) 
+
+
+
 #-------------------UTILS METHODS ---------------------------------------------------
 
 
@@ -221,6 +235,12 @@ def soul(exam,user,question_to_be_fetched,user_question_assigned_arr,duration):
 
     try:
         user_test_status = User_Test_Status.objects.get(user = user,exam = exam)
+        if question_to_be_fetched == None:
+            #final question 
+            user_test_status.status = 3
+            user_test_status.save()
+            resp = Response(200,"Exam completed successfully !")
+            return JsonResponse(resp,status = 200) 
         if duration == -1:
             print('if')
             user_test_status.attempts -= 1

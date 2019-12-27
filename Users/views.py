@@ -218,7 +218,8 @@ def get_user(request):
                         try:
                                 user_obj = User_Credentials.objects.get(user_name =  data['username'])
                                 user = user_obj.user
-                                return JsonResponse(get_user_dict(user),status = 200)
+                                resp = Response(200,get_user_dict(user))
+                                return JsonResponse(resp,status = 200)
 
                         except User_Credentials.DoesNotExist:
                                 resp = Response(203, "username doesnot exists")

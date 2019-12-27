@@ -10,7 +10,7 @@ urlpatterns = [
     path('delete/exam/',delete_exam,name = 'delete a exam'),
     path('get/all/exams/by/user/',get_all_exams_user,name = 'get all exams by user'),
     path('delete/user/test/status/',delete_user_test,name = 'delete a user test status'),
-    #path('get/user/test/status/all/'),
     path('start/exam/',assign_questions_to_exam,name = 'start exam ; doesnot matter for first time or aftermore'),
-    path('scroll/through/exam/',scroll_through_exam,name = 'for pressing next button')
+    path('scroll/through/exam/',scroll_through_exam,name = 'for pressing next button'),
+    path('get/result/',get_result,name = 'get a result fro exams')
 ]
