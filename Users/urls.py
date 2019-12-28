@@ -28,5 +28,6 @@ urlpatterns = [
     path('get/all/users/',get_all_users,name = 'get all users'),
     path('delete/user/',delete_user,name = 'delete a user'),
     path('activate/user/',activate_user,name = 'activate a user'),
+    path('update/user/',update_user,name = 'update a user')
     #try auth
 ]

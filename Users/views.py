@@ -614,6 +614,35 @@ def add_city(request):
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
+# I am not updating user type id and email 
+
+@csrf_exempt
+def update_user(request):
+        if request.method == 'POST':
+                data = json.loads(request.body.decode('utf-8'))
+                if {'auth_key','user_id','f_name','m_name','l_name','address1','address2','phone','city_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                        try:
+                                user_obj = Master_Users.objects.get(id = data['user_id'],is_available = True)
+                                city_obj = Master_City.objects.get(id = data['city_id'],is_available = True)
+                        except Master_Users.DoesNotExist:
+                                resp = Response(203,"user doesnot exists")
+                                return JsonResponse(resp,status = 200)
+                        except Master_City.DoesNotExist:
+                                resp = Response(203,"city doesnot exists")
+                                return JsonResponse(resp,status = 200)
+                        user_obj.first_name = data['f_name']
+                        user_obj.last_name = data['l_name']
+                        user_obj.middle_name = data['m_name']
+                        user_obj.address1 = data['address1']
+                        user_obj.address2 = data['address2']
+                        user_obj.city = city_obj
+                        user_obj.phone = data['phone']
+                        user_obj.save()
+                        resp = Response(200,"user updated successfully")
+                        return JsonResponse(resp,status = 200)
+
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 #_-----------------------UTILS--------------------------------------------------------------
 
