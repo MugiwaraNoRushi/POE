@@ -240,7 +240,7 @@ def soul(exam,user,question_to_be_fetched,user_question_assigned_arr,duration):
             user_test_status.status = 3
             user_test_status.save()
             resp = Response(200,"Exam completed successfully !")
-            return JsonResponse(resp,status = 200) 
+            return resp
         if duration == -1:
             print('if')
             user_test_status.attempts -= 1
@@ -292,6 +292,7 @@ def soul(exam,user,question_to_be_fetched,user_question_assigned_arr,duration):
     main_dict['first_question'] = get_single_question(question_to_be_fetched)
     main_dict['response_option_id'] = response_option_id
     main_dict['duration'] = user_test_status.duration
+    main_dict['status'] = 200
     return main_dict
 
 
