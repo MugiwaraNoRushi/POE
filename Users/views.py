@@ -76,7 +76,6 @@ def signup(request):
                                 address2 = data['address2'],
                                 phone = data['phone'],
                                 email = email,
-                                user_type_id = data['user_type'],
                                 city = city_obj,
                                 entry_time = datetime.now(),
                                 registration_code = random_num

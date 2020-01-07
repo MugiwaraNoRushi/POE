@@ -33,7 +33,7 @@ class Temp_Master_Users(models.Model):
     address1 = models.TextField()
     address2 = models.TextField(default = " ")
     city = models.ForeignKey('Master_City', on_delete=models.SET_NULL, null=True)
-    user_type_id = models.SmallIntegerField()
+    user_type_id = models.SmallIntegerField(default=3)
     entry_time = models.DateTimeField()
     registration_code = models.IntegerField()
 
