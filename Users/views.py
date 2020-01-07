@@ -6,7 +6,7 @@ from datetime import datetime,timezone,timedelta
 from django.http import HttpResponse,JsonResponse
 from django.shortcuts import render
 from Users.models import User_Credentials,Master_Users,Master_City,Temp_Master_Users, Master_Groups,User_Group_Mapping
-from Users.utils import Response,sendEmail
+from Users.utils import *
 from POE.authentication import authenticate
 
 #-------------------------------------------------------------------------------------------------
@@ -76,11 +76,12 @@ def signup(request):
                                 address2 = data['address2'],
                                 phone = data['phone'],
                                 email = email,
+                                user_type_id = data['user_type'],
                                 city = city_obj,
                                 entry_time = datetime.now(),
                                 registration_code = random_num
                                 )
-                        sendEmail(random_num,email)
+                        sendEmail_reg_code(random_num,email)
                         user.save()
                         #what to do next
                         #call the check registration_number method !!
@@ -109,6 +110,12 @@ def validate_registration(request):
                                 reg_time = user_obj.entry_time
                                 difference = timedelta(days = 0,hours = 1,minutes = 0 )
                                 if (now - reg_time < difference):
+                                        if user_obj.user_type_id == 3:
+                                                #in case of student
+                                                active = True
+                                        elif user_obj.user_type_id == 2: 
+                                                active = False
+                                                sendEmail_faculty(user_obj.email)
                                         master_user_obj = Master_Users.objects.create(
                                                 first_name = user_obj.first_name,
                                                 last_name = user_obj.last_name,
@@ -119,13 +126,14 @@ def validate_registration(request):
                                                 email = user_obj.email,
                                                 user_type_id = user_obj.user_type_id,
                                                 city = user_obj.city,
-                                                is_available = True
+                                                is_available = active,
                                         )
                                         master_user_obj.save()
                                         user_cred = User_Credentials.objects.create(
                                                 user_name = user_obj.username,
                                                 password = user_obj.password,
-                                                user = master_user_obj
+                                                user = master_user_obj,
+                                                is_active = active
                                         )
                                         user_cred.save()
                                         user_obj.delete()

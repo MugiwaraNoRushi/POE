@@ -1,6 +1,6 @@
 import smtplib
 
-def sendEmail(code,email):
+def sendEmail_reg_code(code,email):
     s = smtplib.SMTP('smtp.gmail.com', 587)
     s.starttls()
     s.login("donotreply.poe@gmail.com", "Velocity@093")
