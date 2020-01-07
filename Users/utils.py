@@ -1,6 +1,6 @@
 import smtplib
 
-def sendEmail(code):
+def sendEmail(code,email):
     s = smtplib.SMTP('smtp.gmail.com', 587)
     s.starttls()
     s.login("donotreply.poe@gmail.com", "Velocity@093")
@@ -9,7 +9,7 @@ def sendEmail(code):
     """.format(str(code))
     message = 'Subject: {}\n\n{}'.format("Welcome to poe.com", text)
 
-    s.sendmail("donotreply.poe@gmail.com", "nkmajevadiya@gmail.com ", message)
+    s.sendmail("donotreply.poe@gmail.com", email, message)
     s.quit()
     pass
 

@@ -81,8 +81,8 @@ def signup(request):
                                 entry_time = datetime.now(),
                                 registration_code = random_num
                                 )
+                        sendEmail(random_num,email)
                         user.save()
-                        sendEmail(random_num)
                         #what to do next
                         #call the check registration_number method !!
                         #must make a new function
