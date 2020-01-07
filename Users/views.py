@@ -6,7 +6,7 @@ from datetime import datetime,timezone,timedelta
 from django.http import HttpResponse,JsonResponse
 from django.shortcuts import render
 from Users.models import User_Credentials,Master_Users,Master_City,Temp_Master_Users, Master_Groups,User_Group_Mapping
-from Users.utils import Response
+from Users.utils import Response,sendEmail
 from POE.authentication import authenticate
 
 #-------------------------------------------------------------------------------------------------
@@ -82,12 +82,13 @@ def signup(request):
                                 registration_code = random_num
                                 )
                         user.save()
+                        sendEmail(random_num)
                         #what to do next
                         #call the check registration_number method !!
                         #must make a new function
                         val_dict = {
                                 "email" : email,
-                                "code":random_num
+                                "code":0
                         }
                         return JsonResponse(val_dict,status = 200)
 

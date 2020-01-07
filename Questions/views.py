@@ -27,14 +27,15 @@ def add_question(request):
                 option_obj = Master_Option.objects.create(option_text = options_arr[i],question = question_obj)
                 option_obj.save()
                 for j in range(0,len(correct_arr)):
+                    print("correct ans: ",correct_arr[j])
                     if (i == int(correct_arr[j])):
                         correct_option = Master_Correct_Option.objects.create(option = option_obj,question = question_obj)
                         correct_option.save()
 
             resp = Response(200, "Question added successfully")
-            return JsonResponse(resp,status = 200)  
-            
-       
+            return JsonResponse(resp,status = 200)
+
+
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
 
@@ -60,10 +61,41 @@ def delete_question(request):
             except:
                 resp = Response(203,'Question or Options doesnot exists')
                 return JsonResponse(resp,status  = 200)
-        
+
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
-    
+
+
+
+#wrong method 
+# may be required in future
+@csrf_exempt
+def activate_question(request):
+    if request.method == "POST":
+        data = json.loads(request.body.decode('utf-8'))
+        if ({'question_id','auth_key'}.issubset(data.keys())) and authenticate(data['auth_key']):
+            try:
+                question_obj = Master_Question.objects.get(id = data['question_id'],is_available = False)
+                question_obj.is_available = True
+                question_obj.save()
+                option_obj = Master_Option.objects.filter(question = question_obj,is_available =False)
+                for option in option_obj:
+                    option.is_available = True
+                    option.save()
+                correct_option_obj = Master_Correct_Option.objects.filter(question = question_obj,is_available = False)
+                for correct_option in correct_option_obj:
+                    correct_option.is_available = True
+                    correct_option.save()
+                resp = Response(200,"Question activated successfully")
+                return JsonResponse(resp,status = 200)
+            except:
+                resp = Response(203,'Question or Options doesnot exists')
+                return JsonResponse(resp,status  = 200)
+
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
+
+
 @csrf_exempt
 def update_question(request):
     if request.method == "POST":
@@ -96,17 +128,51 @@ def update_question(request):
                 for j in range(0,len(correct_arr)):
                     if (i == int(correct_arr[j])):
                         correct_option = Master_Correct_Option.objects.create(option = option_obj,question = question_obj)
-                        correct_option.save()    
+                        correct_option.save()
             resp = Response(200, "Question modified successfully")
-            return JsonResponse(resp,status = 200)  
-        
+            return JsonResponse(resp,status = 200)
+
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def get_question(request):
+    if request.method == "POST":
+        data = json.loads(request.body.decode('utf-8'))
+        if {'auth_key','question_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            question_obj = Master_Question.objects.get(id = data['question_id'])
+            #question_data = {'data':get_single_question(question_obj)}
+            try:
+                return JsonResponse(get_single_question(question_obj),status = 200)
+            except:
+                resp = Response('Something went wrong',Exception)
+                return JsonResponse(resp, status = 203)
+
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
+
+@csrf_exempt
+def get_all_questions(request):
+    if request.method == "POST":
+        data = json.loads(request.body.decode('utf-8'))
+        if {'auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            questions = Master_Question.objects.all()
+            arr_dict = []
+            questions_data = {'data':arr_dict}
+            try:
+                for question in questions:
+                    arr_dict.append(get_single_question(question))
+                return JsonResponse(questions_data,status = 200)
+            except:
+                resp = Response('Something went wrong GEN 1',Exception)
+                return JsonResponse(resp, status = 477)
+
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
 
 
-
 @csrf_exempt
-def get_all_questions(request):
+def get_all_questions_subtopic(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
         if {'subtopic_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
@@ -121,7 +187,7 @@ def get_all_questions(request):
             except:
                 resp = Response('Something went wrong GEN 1',Exception)
                 return JsonResponse(resp, status = 477)
-        
+
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
 
@@ -153,9 +219,8 @@ def get_single_question(question):
         'question_id':question.id,
         'question_type':question.question_type,
         'question_difficulty':question.difficulty,
+        'is_available':question.is_available,
         'options':option_arr,
         'correct_options':correct_option_arr
     }
     return question_dict
-
-    
