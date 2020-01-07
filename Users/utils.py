@@ -5,8 +5,8 @@ def sendEmail(code):
     s.starttls()
     s.login("donotreply.poe@gmail.com", "Velocity@093")
     text = """
-    Your One Time Password to register for our poe.com is 
-    """ + code
+    Your One Time Password to register for our poe.com is {}
+    """.format(str(code))
     message = 'Subject: {}\n\n{}'.format("Welcome to poe.com", text)
 
     s.sendmail("donotreply.poe@gmail.com", "nkmajevadiya@gmail.com ", message)
