@@ -81,11 +81,8 @@ def signup(request):
                                 entry_time = datetime.now(),
                                 registration_code = random_num
                                 )
-                        sendEmail_reg_code(random_num,email)
+                        sendEmail_reg_code(data['username'],random_num,email)
                         user.save()
-                        #what to do next
-                        #call the check registration_number method !!
-                        #must make a new function
                         val_dict = {
                                 "email" : email,
                                 "code":0
@@ -115,7 +112,7 @@ def validate_registration(request):
                                                 active = True
                                         elif user_obj.user_type_id == 2: 
                                                 active = False
-                                                sendEmail_faculty(user_obj.email)
+                                                sendEmail_faculty(user_obj.username,user_obj.email)
                                         master_user_obj = Master_Users.objects.create(
                                                 first_name = user_obj.first_name,
                                                 last_name = user_obj.last_name,
