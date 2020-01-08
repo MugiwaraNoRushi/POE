@@ -210,7 +210,8 @@ def get_single_question(question):
     for correct_option in correct_options:
         correct_option_dict = {
             'correct_option_text':str(correct_option.option.option_text),
-            'correct_option_id':correct_option.id
+            'correct_option_id':correct_option.id,
+            'option_id':correct_option.option.id,
         }
         correct_option_arr.append(correct_option_dict)
     question_dict = {
