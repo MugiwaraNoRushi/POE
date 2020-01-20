@@ -16,4 +16,5 @@ urlpatterns = [
     path('get/subtopic/',get_subtopic,name = 'get a subtopic'),
     path('activate/topic/',activate_topic,name = 'delete a topic'),
     path('activate/subtopic/',activate_subtopic,name = 'delete a  subtopic'),
+    path('del/topic/perm/',delete_topic_perman,name = 'delete permanently topic')
 ]

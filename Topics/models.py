@@ -6,5 +6,5 @@ class Master_Topic(models.Model):
 
 class Master_SubTopic(models.Model):
     subtopic_text = models.CharField(max_length = 100)
-    topic = models.ForeignKey('Master_Topic',on_delete = models.SET_NULL,null = True)
+    topic = models.ForeignKey('Master_Topic',on_delete = models.CASCADE,null = True)
     is_available = models.BooleanField(default= True)

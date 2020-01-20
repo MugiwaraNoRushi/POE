@@ -110,7 +110,7 @@ def validate_registration(request):
                                         if user_obj.user_type_id == 3:
                                                 #in case of student
                                                 active = True
-                                        elif user_obj.user_type_id == 2: 
+                                        elif user_obj.user_type_id == 2:
                                                 active = False
                                                 sendEmail_faculty(user_obj.username,user_obj.email)
                                         master_user_obj = Master_Users.objects.create(
@@ -190,7 +190,7 @@ def change_password(request):
                         except User_Credentials.DoesNotExist:
                                 resp = Response(203, "Wrong user name ")
                                 return JsonResponse(resp,status  = 200)
-        
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -230,7 +230,7 @@ def get_user(request):
                                 resp = Response(203, "username doesnot exists")
                                 return JsonResponse(resp,status  = 200)
 
-               
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -272,8 +272,8 @@ def delete_user(request):
 
                         resp = Response(200,'User deleted successfully ')
                         return JsonResponse(resp,status = 200)
-             
-      
+
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -319,7 +319,7 @@ def create_group(request):
                         }
                         resp = Response(200,'Created Successfully')
                         return JsonResponse(resp,status = 200)
-        
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -331,14 +331,14 @@ def create_group(request):
 def get_group(request):
         if request.method == 'POST':
                 data = json.loads(request.body.decode('utf-8'))
-                if {'auth_key','group_id'}.issubset(data.keys()) and authenticate(data['auth_key']): 
+                if {'auth_key','group_id'}.issubset(data.keys()) and authenticate(data['auth_key']):
                         try:
                                 group = Master_Groups.objects.get(id = data['group_id'])
                                 return JsonResponse(get_group_dict(group), status = 200)
                         except:
                                 resp = Response(203,'Group doesnot exists')
                                 return JsonResponse(resp,status  = 200)
-               
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -435,7 +435,7 @@ def get_users_from_group(request):
 
                         return JsonResponse(data_dict,status = 200)
 
-              
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -480,7 +480,7 @@ def modify_group(request):
                         group_obj.save()
                         resp = Response(200,'Group modified successfully ')
                         return JsonResponse(resp,status = 200)
-        
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -519,7 +519,7 @@ def activate_group(request):
                         group_obj.save()
                         resp = Response(200,'Group activated successfully ')
                         return JsonResponse(resp,200)
-        
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -527,6 +527,24 @@ def activate_group(request):
 #--------------------------------------------------------------------------------------------------
 
 #CITIES !!
+
+@csrf_exempt
+def get_city(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                        city = Master_City.objects.get(id = data['id'])
+                        arr_dict = []
+                        city_dict = {
+                                'id':city.id,
+                                'name':city.city_text,
+                                'is_available':city.is_available
+                        }
+
+                        return JsonResponse(city_dict,status = 200)
+
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
 
 @csrf_exempt
 def get_all_cities(request):
@@ -583,7 +601,7 @@ def activate_city(request):
                         except:
                                 resp = Response(203,'city doesnot exist')
                                 return JsonResponse(resp,status = 200)
-        
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -597,7 +615,7 @@ def modify_city(request):
                         city.save()
                         resp = Response(200,"City modified")
                         return JsonResponse(resp,status = 200)
-        
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
@@ -615,11 +633,11 @@ def add_city(request):
                                 city.save()
                                 resp = Response(200,"1")
                                 return JsonResponse(resp,status = 200)
-        
+
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
-# I am not updating user type id and email 
+# I am not updating user type id and email
 
 @csrf_exempt
 def update_user(request):

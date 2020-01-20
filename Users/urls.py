@@ -20,6 +20,7 @@ urlpatterns = [
     path('modify/group/',modify_group,name = 'modify a group name'),
     path('delete/group/',delete_group,name = 'delete a group'),
     path('activate/group/',activate_group,name = 'activate a group'),
+    path('get/city/',get_city,name = 'get city'),
     path('get/all/cities/',get_all_cities,name = 'get all cities'),
     path('add/city/',add_city,name = 'add city'),
     path('delete/city/',delete_city,name = 'delete city'),

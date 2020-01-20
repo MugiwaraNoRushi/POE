@@ -264,3 +264,21 @@ def activate_topic(request):
     
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
+
+
+@csrf_exempt
+def delete_topic_perman(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            try:
+                topic = Master_Topic.objects.get(id = data['id'],is_available = True)
+                topic.delete()
+                resp = Response(200, "Deleted permanently")
+                return JsonResponse(resp, status = 200)
+            except Master_SubTopic.DoesNotExist:
+                resp = Response(203,"topic doesnot exist")
+                return JsonResponse(resp,status  = 200)
+    
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
