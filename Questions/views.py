@@ -192,6 +192,25 @@ def get_all_questions_subtopic(request):
     return JsonResponse(resp,status = 405)
 
 
+@csrf_exempt
+def delete_question_perman(request):
+    if request.method == "POST":
+        data = json.loads(request.body.decode('utf-8'))
+        if ({'question_id','auth_key'}.issubset(data.keys())) and authenticate(data['auth_key']):
+            try:
+                question_obj = Master_Question.objects.get(id = data['question_id'],is_available = True)
+                question_obj.delete()
+                resp = Response(200,"Question deleted successfully")
+                return JsonResponse(resp,status = 200)
+            except:
+                resp = Response(203,'Question doesnot exists')
+                return JsonResponse(resp,status  = 200)
+
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
+
+
+
 #-----------------UTILS----------------------------------------------------------------------------
 
 

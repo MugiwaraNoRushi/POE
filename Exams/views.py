@@ -184,6 +184,26 @@ def get_all_exams_user(request):
     return JsonResponse(resp,status = 405)
 
 
+@csrf_exempt
+def delete_exam_perman(request):
+    if request.method == 'POST':
+        data =json.loads(request.body.decode('utf-8'))
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            try:
+                exam = Master_Exam.objects.get(id = data['id'],is_available = True)
+                exam.delete()
+                resp = Response(200,'exam deleted successfully')
+                return JsonResponse(resp,status = 200)
+            except Master_Exam.DoesNotExist:
+                resp = Response(203,'Exam doesnot exists')
+                return JsonResponse(resp,status  = 200)
+       
+    resp = Response(405,'Bad Request!!')
+    return JsonResponse(resp,status = 405)
+
+
+
+
 #--------------------------------UTILS -----------------------------------------------------
 
 def get_exam_dict(exam):

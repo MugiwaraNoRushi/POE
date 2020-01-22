@@ -486,6 +486,50 @@ def get_Template(request):
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
+
+
+@csrf_exempt
+def delete_Section_perman(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            try:
+                section = Master_Section.objects.get(id = data['id'],is_available = True)
+                section.is_available = False
+                section.save()
+                update_marks(section)
+                section.delete()
+                resp = Response(200,'section deleted permanently')
+                return JsonResponse(resp, status = 200)
+            except:
+                resp = Response(203,'section doesnot exist')
+                return JsonResponse(resp,status  = 200)
+        
+    resp = Response(405,'Wrong Request')
+    return JsonResponse(resp, status = 405)
+
+
+
+@csrf_exempt
+def delete_Template_perman(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+            try:
+                template = Master_Template.objects.get(id = data['id'],is_available = True)
+                template.delete()
+                resp = Response(200,'template deleted successfully')
+                return JsonResponse(resp, status = 200)
+            except:
+                resp = Response(203,'template doesnot exist')
+                return JsonResponse(resp,status  = 200)
+        
+    resp = Response(405,'Wrong Request')
+    return JsonResponse(resp, status = 405)
+
+
+
+
     #------------------UTILS---------------------------------------------------------------
 
 def get_template_section_dict(template_section):

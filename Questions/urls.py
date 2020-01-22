@@ -10,5 +10,6 @@ urlpatterns = [
     path('get/question/',get_question,name = 'get question basis of id'),
     path('get/all/questions/',get_all_questions,name = 'get all questions basis of subtopic'),
     path('get/all/questions/subtopic/',get_all_questions_subtopic,name = 'get all questions basis of subtopic'),
-    path('add/questionssss/admin/test/',add_questions, name = 'add many questions for testing purpose')
+    path('add/questionssss/admin/test/',add_questions, name = 'add many questions for testing purpose'),
+    path('delete/question/perm/',delete_question_perman,name = 'delete question permanently')
 ]

@@ -277,6 +277,7 @@ def delete_user(request):
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
+
 @csrf_exempt
 def activate_user(request):
         if request.method == "POST":
@@ -504,6 +505,7 @@ def delete_group(request):
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
 
+
 @csrf_exempt
 def activate_group(request):
         if request.method == "POST":
@@ -666,6 +668,49 @@ def update_user(request):
 
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
+
+
+@csrf_exempt
+def delete_user_perman(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'user_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                        try:
+                                user_obj = Master_Users.objects.get(id = data['user_id'])
+                                user_cred_obj = User_Credentials.objects.get(user = user_obj)
+                        except:
+                                resp = Response(203,'User does not exists')
+                                return JsonResponse(resp,status  = 200)
+
+                        user_obj.delete()
+
+                        resp = Response(200,'User deleted successfully ')
+                        return JsonResponse(resp,status = 200)
+
+
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
+
+
+@csrf_exempt
+def delete_group_perman(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'group_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                        try:
+                                group_obj = Master_Groups.objects.get(id = data['group_id'],is_available = True)
+                        except:
+                                resp = Response(203,'Group doesnot exists')
+                                return JsonResponse(resp,status  = 200)
+
+                        group_obj.delete()
+                        resp = Response(200,'Group deleted successfully ')
+                        return JsonResponse(resp,200)
+
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
+
+
 
 #_-----------------------UTILS--------------------------------------------------------------
 

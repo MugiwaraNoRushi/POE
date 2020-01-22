@@ -12,5 +12,6 @@ urlpatterns = [
     path('delete/user/test/status/',delete_user_test,name = 'delete a user test status'),
     path('start/exam/',assign_questions_to_exam,name = 'start exam ; doesnot matter for first time or aftermore'),
     path('scroll/through/exam/',scroll_through_exam,name = 'for pressing next button'),
-    path('get/result/',get_result,name = 'get a result fro exams')
+    path('get/result/',get_result,name = 'get a result fro exams'),
+    path('delete/question/perm/',delete_exam_perman,name = 'delete exam permnantly')
 ]

@@ -21,5 +21,7 @@ urlpatterns = [
     path('get/sectionwithtemplate/',get_template_section_id,name = 'get a single template section'),
     path('get/all/sectionwithtemplatesbysection/',get_all_template_section_section_id,name = 'get all sectionwithtemplates by section'),
     path('update/section/marks',update_Section_marks,name = 'update section marks'),
-    path('get/all/sections/template/',get_all_Sections_template,name = 'get all sections based on template id')
+    path('get/all/sections/template/',get_all_Sections_template,name = 'get all sections based on template id'),
+    path('delete/template/perm/',delete_Template_perman,name = 'delete template permanently'),
+    path('delete/section/perm',delete_Section_perman,name = 'delete a section permanently')
 ]

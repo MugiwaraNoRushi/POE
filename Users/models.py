@@ -17,7 +17,7 @@ class Master_City(models.Model):
     is_available = models.BooleanField(default= True)
 
 class User_Credentials(models.Model):
-    user = models.ForeignKey('Master_Users',on_delete = models.SET_NULL, null = True)
+    user = models.ForeignKey('Master_Users',on_delete = models.CASCADE, null = True)
     user_name = models.CharField(max_length = 255)
     password = models.CharField(max_length = 255)
     is_active = models.BooleanField(default= True)
@@ -40,9 +40,9 @@ class Temp_Master_Users(models.Model):
 class Master_Groups(models.Model):
     group_name = models.CharField(max_length = 255)
     is_available = models.BooleanField(default= True)
-    group_admin = models.ForeignKey('Master_Users',on_delete = models.SET_NULL, null = True)
+    group_admin = models.ForeignKey('Master_Users',on_delete = models.CASCADE, null = True)
 
 class User_Group_Mapping(models.Model):
-    user = models.ForeignKey('Master_Users',on_delete = models.SET_NULL, null = True)
-    group = models.ForeignKey('Master_Groups',on_delete = models.SET_NULL, null = True)
+    user = models.ForeignKey('Master_Users',on_delete = models.CASCADE, null = True)
+    group = models.ForeignKey('Master_Groups',on_delete = models.CASCADE, null = True)
     
