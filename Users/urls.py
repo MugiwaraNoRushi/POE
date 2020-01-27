@@ -1,5 +1,6 @@
 from django.urls import path
 from Users.views import *
+from Users.subs_views import *
 
 
 urlpatterns = [
@@ -31,6 +32,17 @@ urlpatterns = [
     path('activate/user/',activate_user,name = 'activate a user'),
     path('update/user/',update_user,name = 'update a user'),
     path('delete/user/perman/',delete_user_perman,name = 'delete a user permanently'),
-    path('delete/group/perman/',delete_group_perman,name = 'delete a group permanently')
-    #try auth
+    path('delete/group/perman/',delete_group_perman,name = 'delete a group permanently'),
+    #subs_urls
+    path('add/subscription/',create_subs,name = 'create master subscription'),
+    path('update/subscription/',update_subs,name = 'update master subscription'),
+    path('delete/subscription/',delete_subs,name = 'deactivate master subscription'),
+    path('activate/subscription/',activate_subs,name = 'activate master subscription'),
+    path('delete/subscription/perm/',delete_subs_perman,name = 'delete master subscription permanently'),
+    path('get/subscription/',get_subs,name = 'get single master subscription'),
+    path('add/subscription/for/user/',create_subs_users,name = 'create subs for user'),
+    path('get/subscription/for/user/',get_user_subs,name = 'get single subscription'),
+    path('get/all/subscriptions/for/user/by/user/',get_user_subs_subs_id,name = 'get all subscripitons by user'),
+    path('get/subscriptions/for/user/by/subscription/',get_user_subs_subs_id,name ='get all subscripitons by subscriptions'),
+    path('get/subscriptions/for/user/all/',get_user_subs_all,name ='get all subscriptions'),
 ]

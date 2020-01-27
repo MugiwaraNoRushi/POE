@@ -46,3 +46,17 @@ class User_Group_Mapping(models.Model):
     user = models.ForeignKey('Master_Users',on_delete = models.CASCADE, null = True)
     group = models.ForeignKey('Master_Groups',on_delete = models.CASCADE, null = True)
     
+class Master_Subscription(models.Model):
+    subscription_type = models.SmallIntegerField() # subsctiption time based = 1 count based = 2
+    plan_name = models.CharField(max_length = 50)
+    count_or_no_days = models.SmallIntegerField(null= True,default=0)
+    is_available = models.BooleanField(default= True)
+
+class User_Subscription_Mapping(models.Model):
+    user = models.ForeignKey('Master_Users',on_delete = models.CASCADE, null = True)
+    subscription = models.ForeignKey('Master_Subscription',on_delete=models.CASCADE)
+    start_date = models.DateField(null =True)
+    end_date  = models.DateField(null =True)
+    exam_count = models.SmallIntegerField(null = True)
+    subs_val = models.BooleanField(default=True)
+
