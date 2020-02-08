@@ -156,6 +156,7 @@ def check_username(request):
                 try:
                         data = json.loads(request.body.decode('utf-8'))
                         user_cred = User_Credentials.objects.get(user_name = data['username'])
+                        #check for temp data base 
                         resp = Response(203,"Username exists and You cannot use it")
                         return JsonResponse(resp,status  = 200)
                 except:
