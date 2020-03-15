@@ -12,6 +12,7 @@ from Users.utils import Response
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from POE.authentication import authenticate
+from Exams.views import get_exam_dict
 
 @csrf_exempt
 def assign_questions_to_exam(request):
@@ -178,32 +179,42 @@ def get_result(request):
 
             total_marks = template.template_marks
             marks_obtained = 0
+            question_list = []
             for user_question_assigned in user_question_assigned_arr:
+                question_assigned = user_question_assigned.question
+                negative_marks = user_question_assigned.section.negative_marks
+                #question dict to send and attempted option list to send
+                question_dict = get_single_question(question_assigned)
+                attempt_option_list = []
+                temp_dict = {
+                    'question':question_dict,
+                    'attempted_option':attempt_option_list
+                }
                 try:
                     user_response_arr = User_Question_Response.objects.filter(section_question = user_question_assigned)
-                    question_assigned = user_question_assigned.question
-                    negative_marks = user_question_assigned.section.negative_marks
-                    correct_options_set = {}
+                    correct_options_set = set()
                     correct_options = Master_Correct_Option.objects.filter(question = question_assigned)
                     for correct_option in correct_options:
                         correct_options_set.add(correct_option.option)
 
-                    attempted_options_set = {}
+                    attempted_options_set = set()
                     for user_response in user_response_arr:
                         attempted_options_set.add(user_response.option)
+                        attempt_option_list.append(user_response.option.id)
 
                     if attempted_options_set == correct_options_set:
                         marks_obtained = marks_obtained + (question_assigned.question_marks * question_assigned.difficulty)                        
                     else:
                         marks_obtained = marks_obtained - negative_marks
-
-
+                    
                 except User_Question_Response.DoesNotExist:
                     pass
-        
+                question_list.append(temp_dict)
         marks_dict = {
+            'exam_info':get_exam_dict(exam_obj),
             'marks_obtained':marks_obtained,
-            'total_marks':total_marks
+            'total_marks':total_marks,
+            'questions_set':question_list,
         }   
         return JsonResponse(marks_dict,status = 200)         
          
@@ -211,23 +222,7 @@ def get_result(request):
     return JsonResponse(resp,status = 405)     
 
 
-@csrf_exempt
-def finish_exam(request):
-    if request.method == 'POST':
-        data =json.loads(request.body.decode('utf-8'))
-        if {'user_id','exam_id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
-            pass
-
-
-
-
-    resp = Response(405,'Bad Request!!')
-    return JsonResponse(resp,status = 405) 
-
-
-
 #-------------------UTILS METHODS ---------------------------------------------------
-
 
 
 

@@ -706,7 +706,7 @@ def delete_group_perman(request):
 
                         group_obj.delete()
                         resp = Response(200,'Group deleted successfully ')
-                        return JsonResponse(resp,200)
+                        return JsonResponse(resp,status = 200)
 
         resp = Response(405,'Bad Request!!')
         return JsonResponse(resp,status = 405)
