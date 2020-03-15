@@ -200,9 +200,7 @@ def get_result(request):
                     attempted_options_set = set()
                     for user_response in user_response_arr:
                         attempted_options_set.add(user_response.option)
-                        print(user_response.option)
-                        print(user_response.option.id)
-                        attempt_option_list.append(user_response.option.id)
+                        attempt_option_list.append(user_response.option)
 
                     if attempted_options_set == correct_options_set:
                         marks_obtained = marks_obtained + (question_assigned.question_marks * question_assigned.difficulty)                        
