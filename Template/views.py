@@ -252,7 +252,6 @@ def get_all_Sections_template(request):
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
-
 @csrf_exempt
 def create_template_section(request):
     if request.method == 'POST':
@@ -320,7 +319,6 @@ def update_template_section(request):
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
-
 @csrf_exempt
 def get_all_template_sections(request):
     if request.method == 'POST':
@@ -350,7 +348,6 @@ def get_template_section_id(request):
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
-
 @csrf_exempt
 def get_all_template_section_section_id(request):
     if request.method == 'POST':
@@ -373,7 +370,6 @@ def get_all_template_section_section_id(request):
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
-
 @csrf_exempt
 def delete_section_template(request):
     if request.method == 'POST':
@@ -394,7 +390,6 @@ def delete_section_template(request):
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
-
 @csrf_exempt
 def activate_Template(request):
     if request.method == 'POST':
@@ -412,7 +407,6 @@ def activate_Template(request):
         
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
-
 
 @csrf_exempt
 def activate_Section(request):
@@ -486,15 +480,13 @@ def get_Template(request):
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
-
-
 @csrf_exempt
 def delete_Section_perman(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
-                section = Master_Section.objects.get(id = data['id'],is_available = True)
+                section = Master_Section.objects.get(id = data['id'])
                 section.is_available = False
                 section.save()
                 update_marks(section)
@@ -508,15 +500,13 @@ def delete_Section_perman(request):
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
-
-
 @csrf_exempt
 def delete_Template_perman(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         if {'id','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
             try:
-                template = Master_Template.objects.get(id = data['id'],is_available = True)
+                template = Master_Template.objects.get(id = data['id'])
                 template.delete()
                 resp = Response(200,'template deleted successfully')
                 return JsonResponse(resp, status = 200)
@@ -527,10 +517,7 @@ def delete_Template_perman(request):
     resp = Response(405,'Wrong Request')
     return JsonResponse(resp, status = 405)
 
-
-
-
-    #------------------UTILS---------------------------------------------------------------
+#------------------UTILS---------------------------------------------------------------
 
 def get_template_section_dict(template_section):
     section = template_section.section
@@ -568,7 +555,6 @@ def get_template_section_dict(template_section):
         }
     }
     return temp
-
 
 def update_marks(section):
     template = section.template
