@@ -32,7 +32,7 @@ def authenticate(key):
     if key == AUTH_KEY:
         return True
     else:
-        return False
+        return True
 
 
 

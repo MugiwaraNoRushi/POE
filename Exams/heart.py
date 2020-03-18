@@ -193,15 +193,15 @@ def get_result(request):
                 try:
                     user_response_arr = User_Question_Response.objects.filter(section_question = user_question_assigned)
                     correct_options_set = set()
-                    correct_options = Master_Correct_Option.objects.filter(question = question_assigned)
+                    correct_options = Master_Correct_Option.objects.filter(question = question_assigned,is_available = True)
                     for correct_option in correct_options:
                         correct_options_set.add(correct_option.option)
 
                     attempted_options_set = set()
                     for user_response in user_response_arr:
                         attempted_options_set.add(user_response.option)
-                        attempt_option_list.append(user_response.option)
-
+                        attempt_option_list.append(user_response.option.id)
+                    print(attempted_options_set,correct_options_set)
                     if attempted_options_set == correct_options_set:
                         marks_obtained = marks_obtained + (question_assigned.question_marks * question_assigned.difficulty)                        
                     else:
