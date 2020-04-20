@@ -47,7 +47,6 @@ def update_subs(request):
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
 
-
 @csrf_exempt
 def delete_subs(request):
     if request.method == "POST":
@@ -67,7 +66,6 @@ def delete_subs(request):
 
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
-
 
 @csrf_exempt
 def activate_subs(request):
@@ -89,7 +87,6 @@ def activate_subs(request):
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
         
-
 @csrf_exempt
 def delete_subs_perman(request):
     if request.method == "POST":
@@ -124,7 +121,6 @@ def get_subs(request):
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
 
-
 @csrf_exempt
 def get_all_subs(request):
     if request.method == "POST":
@@ -141,7 +137,6 @@ def get_all_subs(request):
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
 
-#
 @csrf_exempt
 def create_subs_users(request):
     if request.method == "POST":
@@ -208,7 +203,8 @@ def get_user_subs(request):
                 return JsonResponse(resp,status = 200)
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
-    
+
+@csrf_exempt    
 def get_user_subs_user_id(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
@@ -246,8 +242,8 @@ def get_user_subs_user_id(request):
                 return JsonResponse(resp,status = 200)
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
-        
 
+@csrf_exempt        
 def get_user_subs_subs_id(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
@@ -286,7 +282,7 @@ def get_user_subs_subs_id(request):
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
 
-
+@csrf_exempt
 def get_user_subs_all(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
@@ -321,9 +317,7 @@ def get_user_subs_all(request):
     resp = Response(405,'Bad Request!!')
     return JsonResponse(resp,status = 405)
 
-
 #-------------UTILS----------------------------------------------------------------------
-
 
 def get_subs_dict(subs_master):
     subs_dict = {

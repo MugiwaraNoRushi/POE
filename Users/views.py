@@ -1,6 +1,5 @@
 import json
-import random
-from base64 import b64decode
+import random,string
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime,timezone,timedelta
 from django.http import HttpResponse,JsonResponse
@@ -712,6 +711,35 @@ def delete_group_perman(request):
         return JsonResponse(resp,status = 405)
 
 
+# import random, string
+# x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+# print(x)
+
+@csrf_exempt
+def forget_password(request):
+        if request.method == "POST":
+                data = json.loads(request.body.decode('utf-8'))
+                if {'email','auth_key'}.issubset(data.keys()) and authenticate(data['auth_key']):
+                        try:
+                                user_obj = Master_Users.objects.get(email = data['email'])
+                                user_cred = User_Credentials.objects.get(user = user_obj)
+                                random_pass = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+                                print(random_pass)
+                                sendEmail_forgot_password(user_cred.user_name,data['email'],random_pass)
+                                user_cred.password = random_pass
+                                user_cred.save()
+                                resp = Response(200,"Password sent")
+                                return JsonResponse(resp,status = 200)
+
+
+
+                        except:
+                                resp = Response(203,'User doesnot exist') 
+                                return JsonResponse(resp,status = 200)       
+
+        resp = Response(405,'Bad Request!!')
+        return JsonResponse(resp,status = 405)
+                
 
 #_-----------------------UTILS--------------------------------------------------------------
 

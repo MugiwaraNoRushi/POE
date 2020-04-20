@@ -33,6 +33,7 @@ urlpatterns = [
     path('update/user/',update_user,name = 'update a user'),
     path('delete/user/perman/',delete_user_perman,name = 'delete a user permanently'),
     path('delete/group/perman/',delete_group_perman,name = 'delete a group permanently'),
+    path('forget/password/',forget_password,name = 'forgot password and change it to temporary'),
     #subs_urls
     path('add/subscription/',create_subs,name = 'create master subscription'),
     path('update/subscription/',update_subs,name = 'update master subscription'),
@@ -45,4 +46,5 @@ urlpatterns = [
     path('get/all/subscriptions/for/user/by/user/',get_user_subs_subs_id,name = 'get all subscripitons by user'),
     path('get/subscriptions/for/user/by/subscription/',get_user_subs_subs_id,name ='get all subscripitons by subscriptions'),
     path('get/subscriptions/for/user/all/',get_user_subs_all,name ='get all subscriptions'),
+    
 ]

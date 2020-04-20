@@ -30,3 +30,14 @@ def sendEmail_faculty(username,user_email):
     s.sendmail(email_id, user_email, message)
     s.quit()
     pass
+
+def sendEmail_forgot_password(username,user_email,random_password):
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s.starttls()
+    s.login(email_id,password)
+
+    message = 'Subject: {}\n\n{}'.format("Welcome to poe.com", forgot_password.format(username,random_password))
+
+    s.sendmail(email_id, user_email, message)
+    s.quit()
+    pass

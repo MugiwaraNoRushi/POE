@@ -16,3 +16,11 @@ faculty_text = """
     It may take two to three working days.
     Thank you for your patience.
     """
+
+forgot_password = """
+    Dear {}
+    You have applied for resetting the password. 
+    Your temporary password is {}.
+    Please change the password once you login.
+    Thank you for the patience.
+"""
