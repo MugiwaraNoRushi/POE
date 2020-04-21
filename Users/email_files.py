@@ -4,6 +4,10 @@ email_id = "donotreply.poe@gmail.com"
 
 password = "Velocity@093"
 
+smtphost = "smtp.gmail.com"
+
+smtpport = 587
+
 otp_text = """
     Dear {} 
     Thank you for signing up.

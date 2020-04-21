@@ -10,7 +10,7 @@ def Response(status,msg):
     return dict_resp
 
 def sendEmail_reg_code(username,code,user_email):
-    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s = smtplib.SMTP(smtphost, smtpport)
     s.starttls()
     s.login(email_id,password)
 
@@ -21,7 +21,7 @@ def sendEmail_reg_code(username,code,user_email):
     pass
 
 def sendEmail_faculty(username,user_email):
-    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s = smtplib.SMTP(smtphost, smtpport)
     s.starttls()
     s.login(email_id,password)
     
@@ -32,7 +32,7 @@ def sendEmail_faculty(username,user_email):
     pass
 
 def sendEmail_forgot_password(username,user_email,random_password):
-    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s = smtplib.SMTP(smtphost, smtpport)
     s.starttls()
     s.login(email_id,password)
 
